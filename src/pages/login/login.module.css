@@ -1,0 +1,84 @@
+/* src/pages/Login.module.css */
+.container {
+	max-width: 420px;
+	margin: 28px auto;
+	padding: 18px;
+	border-radius: 8px;
+	background: #ffffff;
+	box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+	font-family:
+		system-ui,
+		-apple-system,
+		"Segoe UI",
+		Roboto,
+		"Helvetica Neue",
+		Arial;
+}
+.title {
+	margin: 0 0 12px;
+	font-size: 1.4rem;
+	color: #0f172a;
+}
+.form {
+	display: grid;
+	gap: 10px;
+}
+.label {
+	display: flex;
+	flex-direction: column;
+	font-size: 0.9rem;
+	color: #0f172a;
+}
+.input {
+	margin-top: 6px;
+	padding: 8px 10px;
+	border: 1px solid #e6e9ef;
+	border-radius: 6px;
+	font-size: 0.95rem;
+}
+.actions {
+	margin-top: 8px;
+	display: flex;
+	gap: 10px;
+}
+.button {
+	background: #0ea5a2;
+	color: white;
+	padding: 8px 14px;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+}
+.button[disabled] {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+.error {
+	margin-top: 8px;
+	color: #b91c1c;
+	font-size: 0.9rem;
+}
+.profile {
+	display: flex;
+	gap: 12px;
+	align-items: center;
+}
+.avatar {
+	width: 64px;
+	height: 64px;
+	border-radius: 999px;
+	object-fit: cover;
+	background: #eef2f7;
+}
+.name {
+	font-weight: 600;
+}
+.email {
+	color: #475569;
+	font-size: 0.95rem;
+}
+.small {
+	color: #64748b;
+	font-size: 0.85rem;
+	margin-top: 6px;
+}
