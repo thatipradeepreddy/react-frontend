@@ -1,0 +1,21 @@
+/* Import Inter Font from Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap");
+
+:root {
+	font-family: system-ui, Helvetica, Arial, sans-serif;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	background-color: #f1f5f9;
+	height: 100vh;
+	width: 100vw;
+	padding: 0px;
+	background-color: #f2f2f2;
+}
+
+body {
+	margin: 0px;
+	padding: 0px;
+	text-align: unset;
+	font-family: inherit;
+}
