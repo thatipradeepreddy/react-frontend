@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import styles from "./Login.module.css"
 import { apiLogin, apiLogout } from "../../api/api"
+import { useNavigate } from "react-router-dom"
 
 type UserProfile = {
 	name?: string
@@ -24,6 +25,8 @@ export default function Login() {
 			return null
 		}
 	})
+
+	const navigate = useNavigate()
 
 	useEffect(() => {
 		try {
@@ -94,6 +97,10 @@ export default function Login() {
 					<div className={styles.actions}>
 						<button className={styles.button} type='submit' disabled={loading}>
 							{loading ? "Signing in..." : "Sign in"}
+						</button>
+
+						<button className={styles.button} onClick={() => navigate("/register")}>
+							Register
 						</button>
 					</div>
 

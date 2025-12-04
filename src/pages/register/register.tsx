@@ -1,6 +1,8 @@
-import React, { useState } from "react"
+import React, { useState, useRef } from "react"
 import styles from "./register.module.css"
 import { apiRegister, apiConfirm } from "../../api/api"
+import { requestPresign } from "../../api/s3Upload"
+import axios from "axios"
 
 type FormState = {
 	name: string
@@ -25,26 +27,29 @@ export default function Register() {
 	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState<string | null>(null)
 	const [success, setSuccess] = useState<string | null>(null)
-
 	const [showConfirm, setShowConfirm] = useState(false)
 	const [code, setCode] = useState("")
 	const [confirmLoading, setConfirmLoading] = useState(false)
 	const [confirmError, setConfirmError] = useState<string | null>(null)
+	const [uploadProgress, setUploadProgress] = useState<number>(0)
+	const [uploading, setUploading] = useState<boolean>(false)
+	const [uploadError, setUploadError] = useState<string | null>(null)
+	const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+	const abortRef = useRef<AbortController | null>(null)
+	const MAX_BYTES = Number(import.meta.env.VITE_MAX_PROFILE_IMAGE_BYTES || 1048576)
 
-	function update<K extends keyof FormState>(key: K, value: FormState[K]) {
+	const update = <K extends keyof FormState>(key: K, value: FormState[K]) => {
 		setForm(prev => ({ ...prev, [key]: value }))
 	}
 
-	async function handleSubmit(e: React.FormEvent) {
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
 		setError(null)
 		setSuccess(null)
-
 		if (!form.name || !form.email || !form.password) {
 			setError("Name, email and password are required.")
 			return
 		}
-
 		setLoading(true)
 		try {
 			await apiRegister({
@@ -65,7 +70,7 @@ export default function Register() {
 		}
 	}
 
-	async function handleConfirm(e: React.FormEvent) {
+	const handleConfirm = async (e: React.FormEvent) => {
 		e.preventDefault()
 		setConfirmError(null)
 		if (!code) {
@@ -84,16 +89,89 @@ export default function Register() {
 		}
 	}
 
+	const uploadToS3WithProgress = async (
+		uploadUrl: string,
+		file: File,
+		onProgress?: (percentage: number) => void,
+		signal?: AbortSignal
+	) => {
+		await axios.put(uploadUrl, file, {
+			headers: {
+				"Content-Type": file.type
+			},
+			onUploadProgress: progressEvent => {
+				if (!progressEvent.total) return
+				const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+				if (onProgress) onProgress(percent)
+			},
+			signal
+		})
+		return true
+	}
+
+	const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0]
+		if (!file) return
+
+		if (!file.type.startsWith("image/")) {
+			setUploadError("Only image files are allowed.")
+			return
+		}
+
+		if (file.size > MAX_BYTES) {
+			setUploadError(`File too large. Max ${Math.round(MAX_BYTES / 1024)} KB allowed.`)
+			return
+		}
+
+		setUploadError(null)
+		setUploading(true)
+		setUploadProgress(0)
+
+		const localUrl = URL.createObjectURL(file)
+		setPreviewUrl(localUrl)
+
+		const abort = new AbortController()
+		abortRef.current = abort
+
+		try {
+			const token = localStorage.getItem("token")
+			const BASE = import.meta.env.VITE_API_BASE_URL as string
+
+			const { uploadUrl, key } = await requestPresign(BASE, token, file.name, file.type, file.size)
+
+			await uploadToS3WithProgress(uploadUrl, file, percent => setUploadProgress(percent), abort.signal)
+
+			update("picture", key)
+
+			setUploadProgress(100)
+			setSuccess("Profile image uploaded")
+		} catch (err: any) {
+			if (axios.isCancel && axios.isCancel(err)) {
+				setUploadError("Upload cancelled.")
+			} else if (err?.name === "CanceledError") {
+				setUploadError("Upload cancelled.")
+			} else {
+				console.error(err)
+				setUploadError(err?.error || err?.message || "Upload failed")
+			}
+		} finally {
+			setUploading(false)
+			abortRef.current = null
+		}
+	}
+
+	const cancelUpload = () => {
+		if (abortRef.current) abortRef.current.abort()
+	}
+
 	return (
 		<div className={styles.container}>
 			<h2 className={styles.title}>Register</h2>
-
 			<form className={styles.form} onSubmit={handleSubmit}>
 				<label className={styles.label}>
 					Full name
 					<input className={styles.input} value={form.name} onChange={e => update("name", e.target.value)} />
 				</label>
-
 				<label className={styles.label}>
 					Email
 					<input
@@ -103,7 +181,6 @@ export default function Register() {
 						onChange={e => update("email", e.target.value)}
 					/>
 				</label>
-
 				<label className={styles.label}>
 					Password
 					<input
@@ -113,7 +190,6 @@ export default function Register() {
 						onChange={e => update("password", e.target.value)}
 					/>
 				</label>
-
 				<label className={styles.label}>
 					Phone number
 					<input
@@ -123,7 +199,6 @@ export default function Register() {
 						placeholder='+919...'
 					/>
 				</label>
-
 				<label className={styles.label}>
 					Birthdate
 					<input
@@ -133,7 +208,6 @@ export default function Register() {
 						onChange={e => update("birthdate", e.target.value)}
 					/>
 				</label>
-
 				<label className={styles.label}>
 					Gender
 					<select className={styles.input} value={form.gender} onChange={e => update("gender", e.target.value)}>
@@ -143,7 +217,6 @@ export default function Register() {
 						<option value='other'>Other</option>
 					</select>
 				</label>
-
 				<label className={styles.label}>
 					Picture URL
 					<input
@@ -153,17 +226,33 @@ export default function Register() {
 						placeholder='https://...'
 					/>
 				</label>
-
+				<label className={styles.label}>
+					Profile picture
+					<input className={styles.input} type='file' accept='image/*' onChange={handleFileUpload} />
+				</label>
+				{previewUrl && (
+					<div style={{ marginTop: 8 }}>
+						<img src={previewUrl} alt='preview' style={{ maxWidth: 120, borderRadius: 8 }} />
+					</div>
+				)}
+				{uploading && (
+					<div className={styles.progressWrapper}>
+						<div className={styles.progressBar} style={{ width: `${uploadProgress}%` }} />
+						<span>{uploadProgress}%</span>
+						<button type='button' onClick={cancelUpload} style={{ marginLeft: 8 }}>
+							Cancel
+						</button>
+					</div>
+				)}
+				{uploadError && <div className={styles.error}>{uploadError}</div>}
 				<div className={styles.actions}>
 					<button className={styles.button} type='submit' disabled={loading}>
 						{loading ? "Registering..." : "Register"}
 					</button>
 				</div>
-
 				{error && <div className={styles.error}>{error}</div>}
 				{success && <div className={styles.success}>{success}</div>}
 			</form>
-
 			{showConfirm && (
 				<div className={styles.confirm}>
 					<h3>Confirm account</h3>

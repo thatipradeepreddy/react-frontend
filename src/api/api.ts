@@ -42,7 +42,7 @@ export async function apiLogin(body: LoginRequest) {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify(body),
-		credentials: "include"
+		// credentials: "include"
 	})
 	const data = await res.json().catch(() => ({ error: "Invalid response" }))
 	if (!res.ok) throw data
