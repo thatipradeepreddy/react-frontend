@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import styles from "./Login.module.css"
+import styles from "./login.module.css"
 import { apiLogin, apiLogout } from "../../api/api"
 import { useNavigate } from "react-router-dom"
 
