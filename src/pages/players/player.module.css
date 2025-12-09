@@ -1,0 +1,187 @@
+.page {
+	max-width: 1100px;
+	margin: 0 auto;
+	padding: 2rem;
+	font-family:
+		system-ui,
+		-apple-system,
+		BlinkMacSystemFont,
+		"Segoe UI",
+		sans-serif;
+}
+
+.pageTitle {
+	margin: 0 0 1.5rem;
+	font-size: 1.8rem;
+	font-weight: 600;
+}
+
+.sectionCard {
+	margin-bottom: 2rem;
+	padding: 1.5rem;
+	border-radius: 8px;
+	border: 1px solid #ddd;
+	background-color: #ffffff;
+}
+
+.sectionTitle {
+	margin: 0 0 1rem;
+	font-size: 1.3rem;
+	font-weight: 600;
+}
+
+.form {
+	display: grid;
+	gap: 0.75rem;
+}
+
+.rowTwo,
+.rowThree,
+.rowFour {
+	display: grid;
+	gap: 0.75rem;
+}
+
+.rowTwo {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.rowThree {
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.rowFour {
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.fieldLabel {
+	display: flex;
+	flex-direction: column;
+	font-size: 0.9rem;
+	gap: 0.25rem;
+}
+
+.input,
+.select {
+	padding: 0.4rem 0.5rem;
+	border-radius: 4px;
+	border: 1px solid #ccc;
+	font-size: 0.9rem;
+}
+
+.input:focus,
+.select:focus {
+	outline: none;
+	border-color: #1677ff;
+	box-shadow: 0 0 0 1px rgba(22, 119, 255, 0.2);
+}
+
+.imageActiveRow {
+	display: flex;
+	gap: 1rem;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+.fileLabel {
+	flex: 1;
+}
+
+.checkboxLabel {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	font-size: 0.9rem;
+}
+
+.primaryButton {
+	padding: 0.5rem 1rem;
+	border-radius: 4px;
+	border: none;
+	font-size: 0.95rem;
+	font-weight: 500;
+	background-color: #1677ff;
+	color: #ffffff;
+	cursor: pointer;
+	width: fit-content;
+}
+
+.primaryButton:disabled {
+	opacity: 0.6;
+	cursor: default;
+}
+
+.errorText {
+	color: #ff4d4f;
+	margin-top: 0.5rem;
+	font-size: 0.9rem;
+}
+
+.playersHeader {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 0.5rem;
+}
+
+.playersTitle {
+	font-size: 1.3rem;
+	font-weight: 600;
+}
+
+.playersGrid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+	gap: 1rem;
+}
+
+.playerCard {
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	padding: 0.75rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	background-color: #ffffff;
+}
+
+.playerImage {
+	width: 100%;
+	height: 160px;
+	object-fit: cover;
+	border-radius: 6px;
+}
+
+.playerMeta {
+	font-size: 0.9rem;
+}
+
+.playerMeta strong {
+	font-size: 1rem;
+}
+
+.deleteButton {
+	margin-top: 0.5rem;
+	align-self: flex-start;
+	background: #ff4d4f;
+	color: #fff;
+	border: none;
+	padding: 0.35rem 0.75rem;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 0.85rem;
+}
+
+@media (max-width: 600px) {
+	.rowFour {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.rowThree {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.rowTwo {
+		grid-template-columns: 1fr;
+	}
+}

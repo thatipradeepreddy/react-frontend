@@ -41,7 +41,7 @@ export async function apiLogin(body: LoginRequest) {
 	const res = await fetch(`${BASE}/auth/login`, {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify(body),
+		body: JSON.stringify(body)
 		// credentials: "include"
 	})
 	const data = await res.json().catch(() => ({ error: "Invalid response" }))

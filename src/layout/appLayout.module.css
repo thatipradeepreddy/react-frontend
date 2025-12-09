@@ -1,6 +1,4 @@
 .layout {
-	display: flex;
-	flex-direction: column;
 	height: 100vh;
 }
 
@@ -11,6 +9,6 @@
 
 .mainContent {
 	flex: 1;
-	padding: 20px;
+	/* padding-top: 80px; */
 	background: #f7f7f7;
 }

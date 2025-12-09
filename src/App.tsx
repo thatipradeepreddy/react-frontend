@@ -1,25 +1,29 @@
-import { RouterProvider, createBrowserRouter } from "react-router-dom"
-import ProtectedRoute from "./routes/protectedRoute"
-import Login from "./pages/login/login"
-import Dashboard from "./pages/dashboard/dashboard"
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
+import "./App.css"
 import AppLayout from "./layout/appLayout"
+import ProtectedRoute from "./routes/protectedRoute"
+import Dashboard from "./pages/dashboard/dashboard"
+import Login from "./pages/login/login"
 import Register from "./pages/register/register"
+import PlayersPage from "./pages/players/players"
 
-const router = createBrowserRouter([
-	{ path: "/login", element: <Login /> },
-	{ path: "/register", element: <Register /> },
-	{
-		path: "/",
-		element: <ProtectedRoute />,
-		children: [
-			{
-				element: <AppLayout />,
-				children: [{ path: "/dashboard", element: <Dashboard /> }]
-			}
-		]
-	}
-])
-
-export default function App() {
-	return <RouterProvider router={router} />
+function App() {
+	return (
+		<Router>
+			<Routes>
+				<Route path='/login' element={<Login />} />
+				<Route path='/register' element={<Register />} />
+				<Route element={<AppLayout />}>
+					<Route element={<ProtectedRoute />}>
+						<Route path='/dashboard' element={<Dashboard />} />
+					</Route>
+					<Route element={<ProtectedRoute />}>
+						<Route path='/players' element={<PlayersPage />} />
+					</Route>
+				</Route>
+			</Routes>
+		</Router>
+	)
 }
+
+export default App

@@ -1,18 +1,35 @@
-import Navbar from "../components/navbar/navbar"
-import Sidebar from "../components/sidebar/sidebar"
-import styles from "./appLayout.module.css"
+import { Box } from "@mui/material"
 import { Outlet } from "react-router-dom"
+import { useState } from "react"
+import styles from "./appLayout.module.css"
+import Navbar from "../components/navbar/navbar"
+import SideBar from "../components/sidebar/sidebar"
 
-export default function AppLayout() {
+const Layout = () => {
+	const [sidebarOpen, setSidebarOpen] = useState(false)
+	const toggleSidebar = () => {
+		setSidebarOpen(prev => !prev)
+	}
+
 	return (
-		<div className={styles.layout}>
-			<Navbar />
-			<div className={styles.contentWrapper}>
-				<Sidebar />
-				<main className={styles.mainContent}>
-					<Outlet />
-				</main>
-			</div>
-		</div>
+		<Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+			<Navbar toggleSidebar={toggleSidebar} />
+			<SideBar open={sidebarOpen} toggleSidebar={toggleSidebar} />
+			<Box
+				component='main'
+				className={styles.scrollHidden}
+				sx={{
+					mt: { xs: "56px", sm: "64px" },
+					flexGrow: 1,
+					overflowY: "auto",
+					pl: 2,
+					py: 2
+				}}
+			>
+				<Outlet />
+			</Box>
+		</Box>
 	)
 }
+
+export default Layout
