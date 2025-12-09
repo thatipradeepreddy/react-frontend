@@ -1,9 +1,9 @@
 import type { PlayerResponse, CreatePlayerPayload } from "../types/player.types"
 
-const API_BASE_URL = "http://localhost:3000/api"
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL as string) || ""
 
 export async function fetchPlayers(): Promise<PlayerResponse[]> {
-	const res = await fetch(`${API_BASE_URL}/players`)
+	const res = await fetch(`${API_BASE_URL}/api/players`)
 	if (!res.ok) throw new Error("Failed to fetch players")
 	return res.json()
 }
@@ -30,7 +30,7 @@ export async function createPlayerImageUploadUrl(
 	fileName: string,
 	contentType: string
 ): Promise<{ uploadUrl: string; key: string }> {
-	const res = await fetch(`${API_BASE_URL}/players/${playerId}/image-url`, {
+	const res = await fetch(`${API_BASE_URL}/api/players/${playerId}/image-url`, {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json"
@@ -62,7 +62,7 @@ export async function uploadPlayerImageToS3(uploadUrl: string, file: File): Prom
 }
 
 export async function deletePlayer(playerId: string): Promise<void> {
-	const res = await fetch(`${API_BASE_URL}/players/${playerId}`, {
+	const res = await fetch(`${API_BASE_URL}/api/players/${playerId}`, {
 		method: "DELETE"
 	})
 	if (!res.ok && res.status !== 204) {
