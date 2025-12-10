@@ -1,11 +1,10 @@
-/* src/pages/Register.module.css */
 .container {
-	max-width: 520px;
-	margin: 28px auto;
-	padding: 18px;
-	border-radius: 8px;
-	background: #ffffff;
-	box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+	min-height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 24px;
+	background: radial-gradient(circle at top, #e0f2fe 0, #f8fafc 45%, #f1f5f9 100%);
 	font-family:
 		system-ui,
 		-apple-system,
@@ -14,79 +13,228 @@
 		"Helvetica Neue",
 		Arial;
 }
+
+.card {
+	width: 100%;
+	max-width: 520px;
+	background: #ffffff;
+	border-radius: 18px;
+	padding: 24px 28px 28px;
+	box-shadow:
+		0 18px 40px rgba(15, 23, 42, 0.08),
+		0 1px 3px rgba(15, 23, 42, 0.06);
+	border: 1px solid #e5e7eb;
+}
+
 .title {
-	margin: 0 0 12px;
-	font-size: 1.4rem;
+	margin: 0 0 16px;
+	font-size: 1.6rem;
+	font-weight: 600;
 	color: #0f172a;
+	letter-spacing: -0.02em;
+	text-align: center;
 }
+
 .form {
-	display: grid;
-	gap: 10px;
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	margin-top: 8px;
 }
+
 .label {
 	display: flex;
 	flex-direction: column;
 	font-size: 0.9rem;
-	color: #0f172a;
+	color: #111827;
+	font-weight: 500;
 }
+
 .input {
 	margin-top: 6px;
-	padding: 8px 10px;
-	border: 1px solid #e6e9ef;
-	border-radius: 6px;
+	padding: 10px 12px;
+	border-radius: 10px;
+	border: 1px solid #e5e7eb;
 	font-size: 0.95rem;
+	background-color: #f9fafb;
+	transition:
+		border-color 0.15s ease,
+		box-shadow 0.15s ease,
+		background-color 0.15s ease,
+		transform 0.08s ease;
+	outline: none;
 }
+
+.input:focus {
+	border-color: #0ea5a2;
+	background-color: #ffffff;
+	box-shadow:
+		0 0 0 1px rgba(14, 165, 160, 0.2),
+		0 8px 18px rgba(15, 23, 42, 0.06);
+	transform: translateY(-1px);
+}
+
+.input::placeholder {
+	color: #9ca3af;
+}
+
 .actions {
-	margin-top: 8px;
+	margin-top: 16px;
 	display: flex;
+	justify-content: flex-end;
 	gap: 10px;
 }
+
 .button {
-	background: #0ea5a2;
-	color: white;
-	padding: 8px 14px;
+	background: linear-gradient(135deg, #0ea5e9, #0ea5a2);
+	color: #ffffff;
+	padding: 10px 18px;
 	border: none;
-	border-radius: 6px;
+	border-radius: 999px;
 	cursor: pointer;
+	font-size: 0.95rem;
+	font-weight: 600;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 120px;
+	box-shadow:
+		0 10px 20px rgba(14, 165, 233, 0.25),
+		0 2px 4px rgba(15, 23, 42, 0.15);
+	transition:
+		transform 0.12s ease,
+		box-shadow 0.12s ease,
+		opacity 0.12s ease,
+		filter 0.12s ease;
 }
+
+.button:hover:not([disabled]) {
+	transform: translateY(-1px);
+	box-shadow:
+		0 14px 26px rgba(14, 165, 233, 0.3),
+		0 4px 6px rgba(15, 23, 42, 0.18);
+	filter: brightness(1.03);
+}
+
+.button:active:not([disabled]) {
+	transform: translateY(0);
+	box-shadow:
+		0 6px 14px rgba(14, 165, 233, 0.2),
+		0 1px 3px rgba(15, 23, 42, 0.2);
+}
+
 .button[disabled] {
-	opacity: 0.6;
+	opacity: 0.65;
 	cursor: not-allowed;
+	box-shadow: none;
 }
+
 .error {
-	margin-top: 8px;
+	margin-top: 10px;
+	padding: 8px 10px;
+	border-radius: 10px;
+	background-color: #fef2f2;
+	border: 1px solid #fecaca;
 	color: #b91c1c;
 	font-size: 0.9rem;
 }
+
 .success {
-	margin-top: 8px;
-	color: #065f46;
+	margin-top: 10px;
+	padding: 8px 10px;
+	border-radius: 10px;
+	background-color: #ecfdf5;
+	border: 1px solid #bbf7d0;
+	color: #047857;
 	font-size: 0.9rem;
 }
+
 .confirm {
 	margin-top: 18px;
-	padding-top: 12px;
-	border-top: 1px dashed #e6e9ef;
+	padding: 14px 14px 16px;
+	border-radius: 14px;
+	background: #f9fafb;
+	border: 1px dashed #e5e7eb;
+}
+
+.confirmTitle {
+	margin: 0 0 6px;
+	font-size: 1rem;
+	font-weight: 600;
+	color: #0f172a;
+}
+
+.confirmText {
+	margin: 0 0 10px;
+	font-size: 0.9rem;
+	color: #4b5563;
+}
+
+.previewWrapper {
+	margin-top: 8px;
+	display: flex;
+	align-items: center;
+}
+
+.previewImage {
+	max-width: 120px;
+	border-radius: 12px;
+	border: 1px solid #e5e7eb;
+	box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
 }
 
 .progressWrapper {
-	width: 100%;
-	background: #eee;
-	border-radius: 8px;
-	height: 10px;
-	margin-top: 6px;
-	position: relative;
+	margin-top: 10px;
+	padding: 10px 12px;
+	border-radius: 12px;
+	background-color: #f9fafb;
+	border: 1px solid #e5e7eb;
+	display: flex;
+	align-items: center;
+	gap: 10px;
 }
 
 .progressBar {
-	height: 100%;
-	background: #4caf50;
-	border-radius: 8px;
+	height: 8px;
+	border-radius: 999px;
+	background: linear-gradient(90deg, #a5f3fc, #22c55e);
 	transition: width 0.2s ease;
 }
 
 .progressWrapper span {
-	display: block;
-	margin-top: 4px;
-	font-size: 12px;
+	font-size: 0.75rem;
+	color: #0f172a;
+	min-width: 40px;
+	text-align: right;
+}
+
+.cancelButton {
+	margin-left: auto;
+	font-size: 0.8rem;
+	border: none;
+	background: transparent;
+	color: #0ea5a2;
+	cursor: pointer;
+	font-weight: 500;
+	text-decoration: underline;
+	padding: 4px 0;
+}
+
+.cancelButton:hover {
+	color: #0f766e;
+}
+
+@media (max-width: 640px) {
+	.card {
+		padding: 20px 18px 22px;
+		border-radius: 16px;
+	}
+
+	.title {
+		font-size: 1.4rem;
+	}
+
+	.button {
+		width: 100%;
+	}
 }

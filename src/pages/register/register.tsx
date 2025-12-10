@@ -158,113 +158,115 @@ export default function Register() {
 
 	return (
 		<div className={styles.container}>
-			<h2 className={styles.title}>Register</h2>
-			<form className={styles.form} onSubmit={handleSubmit}>
-				<label className={styles.label}>
-					Full name
-					<input className={styles.input} value={form.name} onChange={e => update("name", e.target.value)} />
-				</label>
-				<label className={styles.label}>
-					Email
-					<input
-						className={styles.input}
-						type='email'
-						value={form.email}
-						onChange={e => update("email", e.target.value)}
-					/>
-				</label>
-				<label className={styles.label}>
-					Password
-					<input
-						className={styles.input}
-						type='password'
-						value={form.password}
-						onChange={e => update("password", e.target.value)}
-					/>
-				</label>
-				<label className={styles.label}>
-					Phone number
-					<input
-						className={styles.input}
-						value={form.phoneNumber}
-						onChange={e => update("phoneNumber", e.target.value)}
-						placeholder='+919...'
-					/>
-				</label>
-				<label className={styles.label}>
-					Birthdate
-					<input
-						className={styles.input}
-						type='date'
-						value={form.birthdate}
-						onChange={e => update("birthdate", e.target.value)}
-					/>
-				</label>
-				<label className={styles.label}>
-					Gender
-					<select className={styles.input} value={form.gender} onChange={e => update("gender", e.target.value)}>
-						<option value=''>Select</option>
-						<option value='male'>Male</option>
-						<option value='female'>Female</option>
-						<option value='other'>Other</option>
-					</select>
-				</label>
-
-				<label className={styles.label}>
-					Profile picture
-					<input className={styles.input} type='file' accept='image/*' onChange={handleFileUpload} />
-				</label>
-
-				{previewUrl && (
-					<div style={{ marginTop: 8 }}>
-						<img src={previewUrl} alt='preview' style={{ maxWidth: 120, borderRadius: 8 }} />
-					</div>
-				)}
-
-				{uploading && (
-					<div className={styles.progressWrapper}>
-						<div className={styles.progressBar} style={{ width: `${uploadProgress}%` }} />
-						<span>{uploadProgress}%</span>
-						<button type='button' onClick={cancelUpload} style={{ marginLeft: 8 }}>
-							Cancel
-						</button>
-					</div>
-				)}
-
-				{uploadError && <div className={styles.error}>{uploadError}</div>}
-
-				<div className={styles.actions}>
-					<button className={styles.button} type='submit' disabled={loading}>
-						{loading ? "Registering..." : "Register"}
-					</button>
-				</div>
-
-				{error && <div className={styles.error}>{error}</div>}
-				{success && <div className={styles.success}>{success}</div>}
-			</form>
-
-			{showConfirm && (
-				<div className={styles.confirm}>
-					<h3>Confirm account</h3>
-					<p>
-						Enter the code sent to <strong>{form.email}</strong>
-					</p>
-					<form onSubmit={handleConfirm}>
+			<div className={styles.card}>
+				<h2 className={styles.title}>Register</h2>
+				<form className={styles.form} onSubmit={handleSubmit}>
+					<label className={styles.label}>
+						Full name
+						<input className={styles.input} value={form.name} onChange={e => update("name", e.target.value)} />
+					</label>
+					<label className={styles.label}>
+						Email
 						<input
 							className={styles.input}
-							value={code}
-							onChange={e => setCode(e.target.value)}
-							placeholder='123456'
+							type='email'
+							value={form.email}
+							onChange={e => update("email", e.target.value)}
 						/>
-						<div className={styles.actions}>
-							<button className={styles.button} type='submit' disabled={confirmLoading}>
-								{confirmLoading ? "Verifying..." : "Verify"}
+					</label>
+					<label className={styles.label}>
+						Password
+						<input
+							className={styles.input}
+							type='password'
+							value={form.password}
+							onChange={e => update("password", e.target.value)}
+						/>
+					</label>
+					<label className={styles.label}>
+						Phone number
+						<input
+							className={styles.input}
+							value={form.phoneNumber}
+							onChange={e => update("phoneNumber", e.target.value)}
+							placeholder='+919...'
+						/>
+					</label>
+					<label className={styles.label}>
+						Birthdate
+						<input
+							className={styles.input}
+							type='date'
+							value={form.birthdate}
+							onChange={e => update("birthdate", e.target.value)}
+						/>
+					</label>
+					<label className={styles.label}>
+						Gender
+						<select className={styles.input} value={form.gender} onChange={e => update("gender", e.target.value)}>
+							<option value=''>Select</option>
+							<option value='male'>Male</option>
+							<option value='female'>Female</option>
+							<option value='other'>Other</option>
+						</select>
+					</label>
+
+					<label className={styles.label}>
+						Profile picture
+						<input className={styles.input} type='file' accept='image/*' onChange={handleFileUpload} />
+					</label>
+
+					{previewUrl && (
+						<div className={styles.previewWrapper}>
+							<img src={previewUrl} alt='preview' className={styles.previewImage} />
+						</div>
+					)}
+
+					{uploading && (
+						<div className={styles.progressWrapper}>
+							<div className={styles.progressBar} style={{ width: `${uploadProgress}%` }} />
+							<span>{uploadProgress}%</span>
+							<button type='button' onClick={cancelUpload} className={styles.cancelButton}>
+								Cancel
 							</button>
 						</div>
-						{confirmError && <div className={styles.error}>{confirmError}</div>}
-					</form>
-				</div>
-			)}
+					)}
+
+					{uploadError && <div className={styles.error}>{uploadError}</div>}
+
+					<div className={styles.actions}>
+						<button className={styles.button} type='submit' disabled={loading}>
+							{loading ? "Registering..." : "Register"}
+						</button>
+					</div>
+
+					{error && <div className={styles.error}>{error}</div>}
+					{success && <div className={styles.success}>{success}</div>}
+				</form>
+
+				{showConfirm && (
+					<div className={styles.confirm}>
+						<h3 className={styles.confirmTitle}>Confirm account</h3>
+						<p className={styles.confirmText}>
+							Enter the code sent to <strong>{form.email}</strong>
+						</p>
+						<form onSubmit={handleConfirm}>
+							<input
+								className={styles.input}
+								value={code}
+								onChange={e => setCode(e.target.value)}
+								placeholder='123456'
+							/>
+							<div className={styles.actions}>
+								<button className={styles.button} type='submit' disabled={confirmLoading}>
+									{confirmLoading ? "Verifying..." : "Verify"}
+								</button>
+							</div>
+							{confirmError && <div className={styles.error}>{confirmError}</div>}
+						</form>
+					</div>
+				)}
+			</div>
 		</div>
 	)
 }

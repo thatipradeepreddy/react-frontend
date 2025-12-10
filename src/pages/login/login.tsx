@@ -55,6 +55,7 @@ export default function Login() {
 			}
 			localStorage.setItem("userProfile", JSON.stringify(profile))
 			setUser(profile)
+			navigate("/dashboard")
 		} catch (err: any) {
 			setError(err?.error || err?.message || "Login failed")
 		} finally {
@@ -76,9 +77,10 @@ export default function Login() {
 
 	return (
 		<div className={styles.container}>
-			<h2 className={styles.title}>Login</h2>
+			<div className={styles.card}>
+				<h2 className={styles.title}>Welcome back</h2>
+				<p className={styles.subtitle}>Sign in to continue to your account</p>
 
-			{!user ? (
 				<form className={styles.form} onSubmit={handleLogin}>
 					<label className={styles.label}>
 						Email
@@ -95,32 +97,23 @@ export default function Login() {
 					</label>
 
 					<div className={styles.actions}>
-						<button className={styles.button} type='submit' disabled={loading}>
+						<button className={styles.buttonPrimary} type='submit' disabled={loading}>
 							{loading ? "Signing in..." : "Sign in"}
 						</button>
 
-						<button className={styles.button} onClick={() => navigate("/register")}>
-							Register
+						<button
+							className={styles.buttonGhost}
+							type='button'
+							onClick={() => navigate("/register")}
+							disabled={loading}
+						>
+							Create account
 						</button>
 					</div>
 
 					{error && <div className={styles.error}>{error}</div>}
 				</form>
-			) : (
-				<div className={styles.profile}>
-					<img src={user.picture || ""} alt='avatar' className={styles.avatar} />
-					<div>
-						<div className={styles.name}>{user.name}</div>
-						<div className={styles.email}>{user.email}</div>
-						<div className={styles.small}>Birthdate: {user.birthdate ?? "—"}</div>
-						<div className={styles.actions}>
-							<button className={styles.button} onClick={handleLogout} disabled={loading}>
-								Logout
-							</button>
-						</div>
-					</div>
-				</div>
-			)}
+			</div>
 		</div>
 	)
 }

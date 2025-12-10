@@ -114,10 +114,16 @@ const PlayersPage: React.FC = () => {
 
 	return (
 		<div className={styles.page}>
-			<h1 className={styles.pageTitle}>Cricket Players</h1>
+			<div className={styles.pageHeader}>
+				<h1 className={styles.pageTitle}>Cricket Players</h1>
+				<p className={styles.pageSubtitle}>Create, manage and track your team profiles</p>
+			</div>
 
 			<section className={styles.sectionCard}>
-				<h2 className={styles.sectionTitle}>Add Player</h2>
+				<div className={styles.sectionHeader}>
+					<h2 className={styles.sectionTitle}>Add Player</h2>
+					<p className={styles.sectionSubtitle}>Fill in the details to create a new player</p>
+				</div>
 
 				<form onSubmit={handleSubmit} className={styles.form}>
 					<div className={styles.rowTwo}>
@@ -232,12 +238,12 @@ const PlayersPage: React.FC = () => {
 					<div className={styles.imageActiveRow}>
 						<label className={`${styles.fieldLabel} ${styles.fileLabel}`}>
 							Profile Image
-							<input type='file' accept='image/*' onChange={handleImageChange} />
+							<input type='file' accept='image/*' onChange={handleImageChange} className={styles.fileInput} />
 						</label>
 
 						<label className={styles.checkboxLabel}>
 							<input type='checkbox' name='isActive' checked={!!formData.isActive} onChange={handleChange} />
-							Active
+							<span>Active</span>
 						</label>
 					</div>
 
@@ -249,23 +255,48 @@ const PlayersPage: React.FC = () => {
 				</form>
 			</section>
 
-			<section>
-				<h2 className={styles.playersTitle}>Players</h2>
-				{loading && <p>Loading...</p>}
-				{!loading && players.length === 0 && <p>No players yet.</p>}
+			<section className={styles.sectionCard}>
+				<div className={styles.sectionHeader}>
+					<h2 className={styles.playersTitle}>Players</h2>
+					<p className={styles.sectionSubtitle}>Overview of all players in your squad</p>
+				</div>
+
+				{loading && <p className={styles.helperText}>Loading...</p>}
+				{!loading && players.length === 0 && <p className={styles.helperText}>No players yet.</p>}
 
 				<div className={styles.playersGrid}>
 					{players.map(p => (
 						<div key={p.id} className={styles.playerCard}>
 							{p.imageUrl && <img src={p.imageUrl} alt={p.name} className={styles.playerImage} />}
 
-							<div className={styles.playerMeta}>
-								<strong>{p.name}</strong> ({p.role})
+							<div className={styles.playerHeader}>
+								<div className={styles.playerNameRole}>
+									<div className={styles.playerName}>{p.name}</div>
+									<span className={styles.rolePill}>{p.role}</span>
+								</div>
+								<div className={styles.playerMetaMuted}>Village: {p.village}</div>
 							</div>
-							<div className={styles.playerMeta}>Village: {p.village}</div>
-							{p.runs !== undefined && <div className={styles.playerMeta}>Runs: {p.runs}</div>}
-							{p.wickets !== undefined && <div className={styles.playerMeta}>Wkts: {p.wickets}</div>}
-							<div className={styles.playerMeta}>Active: {p.isActive ? "Yes" : "No"}</div>
+
+							<div className={styles.playerStatsRow}>
+								{p.runs !== undefined && (
+									<div className={styles.statItem}>
+										<span className={styles.statLabel}>Runs</span>
+										<span className={styles.statValue}>{p.runs}</span>
+									</div>
+								)}
+								{p.wickets !== undefined && (
+									<div className={styles.statItem}>
+										<span className={styles.statLabel}>Wickets</span>
+										<span className={styles.statValue}>{p.wickets}</span>
+									</div>
+								)}
+								<div className={styles.statItem}>
+									<span className={styles.statLabel}>Active</span>
+									<span className={p.isActive ? styles.activeTag : styles.inactiveTag}>
+										{p.isActive ? "Yes" : "No"}
+									</span>
+								</div>
+							</div>
 
 							<button onClick={() => handleDelete(p.id)} className={styles.deleteButton}>
 								Delete

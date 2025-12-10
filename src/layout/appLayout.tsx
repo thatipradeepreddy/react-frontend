@@ -21,9 +21,7 @@ const Layout = () => {
 				sx={{
 					mt: { xs: "56px", sm: "64px" },
 					flexGrow: 1,
-					overflowY: "auto",
-					pl: 2,
-					py: 2
+					overflowY: "auto"
 				}}
 			>
 				<Outlet />
