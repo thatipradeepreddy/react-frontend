@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react"
 import styles from "./register.module.css"
 import { apiRegister, apiConfirm } from "../../api/api"
-import { requestPresign } from "../../api/s3Upload"
+import { requestRegisterImagePresign, uploadToS3WithProgress } from "../../api/s3Upload"
 import axios from "axios"
 
 type FormState = {
@@ -46,10 +46,17 @@ export default function Register() {
 		e.preventDefault()
 		setError(null)
 		setSuccess(null)
+
 		if (!form.name || !form.email || !form.password) {
 			setError("Name, email and password are required.")
 			return
 		}
+
+		if (!form.picture) {
+			setError("Please upload a profile picture before registering.")
+			return
+		}
+
 		setLoading(true)
 		try {
 			await apiRegister({
@@ -59,8 +66,9 @@ export default function Register() {
 				phoneNumber: form.phoneNumber || undefined,
 				birthdate: form.birthdate || undefined,
 				gender: form.gender || undefined,
-				picture: form.picture || undefined
+				picture: form.picture
 			})
+
 			setSuccess("Signup initiated. Check your email or phone for the verification code.")
 			setShowConfirm(true)
 		} catch (err: any) {
@@ -89,29 +97,14 @@ export default function Register() {
 		}
 	}
 
-	const uploadToS3WithProgress = async (
-		uploadUrl: string,
-		file: File,
-		onProgress?: (percentage: number) => void,
-		signal?: AbortSignal
-	) => {
-		await axios.put(uploadUrl, file, {
-			headers: {
-				"Content-Type": file.type
-			},
-			onUploadProgress: progressEvent => {
-				if (!progressEvent.total) return
-				const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-				if (onProgress) onProgress(percent)
-			},
-			signal
-		})
-		return true
-	}
-
 	const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0]
 		if (!file) return
+
+		if (!form.email) {
+			setUploadError("Please enter your email before uploading a profile picture.")
+			return
+		}
 
 		if (!file.type.startsWith("image/")) {
 			setUploadError("Only image files are allowed.")
@@ -134,10 +127,9 @@ export default function Register() {
 		abortRef.current = abort
 
 		try {
-			const token = localStorage.getItem("token")
 			const BASE = import.meta.env.VITE_API_BASE_URL as string
 
-			const { uploadUrl, key } = await requestPresign(BASE, token, file.name, file.type, file.size)
+			const { uploadUrl, key } = await requestRegisterImagePresign(BASE, form.email, file.name, file.type)
 
 			await uploadToS3WithProgress(uploadUrl, file, percent => setUploadProgress(percent), abort.signal)
 
@@ -217,24 +209,18 @@ export default function Register() {
 						<option value='other'>Other</option>
 					</select>
 				</label>
-				<label className={styles.label}>
-					Picture URL
-					<input
-						className={styles.input}
-						value={form.picture}
-						onChange={e => update("picture", e.target.value)}
-						placeholder='https://...'
-					/>
-				</label>
+
 				<label className={styles.label}>
 					Profile picture
 					<input className={styles.input} type='file' accept='image/*' onChange={handleFileUpload} />
 				</label>
+
 				{previewUrl && (
 					<div style={{ marginTop: 8 }}>
 						<img src={previewUrl} alt='preview' style={{ maxWidth: 120, borderRadius: 8 }} />
 					</div>
 				)}
+
 				{uploading && (
 					<div className={styles.progressWrapper}>
 						<div className={styles.progressBar} style={{ width: `${uploadProgress}%` }} />
@@ -244,15 +230,19 @@ export default function Register() {
 						</button>
 					</div>
 				)}
+
 				{uploadError && <div className={styles.error}>{uploadError}</div>}
+
 				<div className={styles.actions}>
 					<button className={styles.button} type='submit' disabled={loading}>
 						{loading ? "Registering..." : "Register"}
 					</button>
 				</div>
+
 				{error && <div className={styles.error}>{error}</div>}
 				{success && <div className={styles.success}>{success}</div>}
 			</form>
+
 			{showConfirm && (
 				<div className={styles.confirm}>
 					<h3>Confirm account</h3>

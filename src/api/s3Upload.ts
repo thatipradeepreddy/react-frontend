@@ -1,20 +1,14 @@
 import axios from "axios"
 
-export async function requestPresign(
-	apiBase: string,
-	token: string | null,
-	filename: string,
-	contentType: string,
-	contentLength?: number
-) {
-	const res = await fetch(`${apiBase}/s3/presign`, {
+export async function requestRegisterImagePresign(apiBase: string, email: string, fileName: string, contentType: string) {
+	const res = await fetch(`${apiBase}/auth/register/image-url`, {
 		method: "POST",
 		headers: {
-			"Content-Type": "application/json",
-			...(token ? { Authorization: `Bearer ${token}` } : {})
+			"Content-Type": "application/json"
 		},
-		body: JSON.stringify({ filename, contentType, contentLength })
+		body: JSON.stringify({ email, fileName, contentType })
 	})
+
 	if (!res.ok) throw await res.json()
 	return res.json()
 }
@@ -29,8 +23,6 @@ export async function uploadToS3WithProgress(
 		headers: {
 			"Content-Type": file.type
 		},
-		withCredentials: false,
-
 		onUploadProgress: progressEvent => {
 			if (!progressEvent.total) return
 			const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total)
@@ -38,18 +30,6 @@ export async function uploadToS3WithProgress(
 		},
 		signal
 	})
-	return true
-}
 
-export async function requestPresignedGet(apiBase: string, token: string | null, key: string) {
-	const res = await fetch(`${apiBase}/s3/presign-download`, {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-			...(token ? { Authorization: `Bearer ${token}` } : {})
-		},
-		body: JSON.stringify({ key })
-	})
-	if (!res.ok) throw await res.json()
-	return res.json()
+	return true
 }

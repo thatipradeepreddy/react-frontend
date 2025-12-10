@@ -12,37 +12,7 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 	const navigate = useNavigate()
 
-	// const userEmail = localStorage.getItem("userEmail") || "Unknown User"
 	const userRole = localStorage.getItem("userRole")
-	const userDetails = localStorage.getItem("userData")
-	const userName = userDetails ? JSON.parse(userDetails).name : "User"
-
-	const getUserNameFull = (name: string) => {
-		if (!name || name.trim().length === 0) return "Unknown User"
-
-		// Convert to lowercase and capitalize each word
-		const formattedName = name
-			.trim()
-			.toLowerCase()
-			.split(/\s+/)
-			.map(word => word.charAt(0).toUpperCase() + word.slice(1))
-			.join(" ")
-
-		// Apply length restriction (15 characters)
-		return formattedName.length > 15 ? `${formattedName.slice(0, 15)}...` : formattedName
-	}
-
-	const getUserName = (name: string) => {
-		if (!name || name.trim().length === 0) return "Unknown User"
-
-		const firstName = name
-			.trim()
-			.split(/\s+/)[0]
-			.toLowerCase()
-			.replace(/^\w/, c => c.toUpperCase())
-
-		return firstName
-	}
 
 	const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
 		setAnchorEl(event.currentTarget)
@@ -56,8 +26,7 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
 		setAnchorEl(null)
 
 		localStorage.clear()
-		// sessionStorage.clear();
-		// Cookie.remove("jwt_token");
+
 		navigate("/", { replace: true })
 	}
 
@@ -67,6 +36,8 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
 
 	const user = JSON.parse(localStorage.getItem("userProfile") || "{}")
 
+	console.log(user)
+
 	return (
 		<AppBar position='fixed' sx={{ bgcolor: "white", boxShadow: "none", zIndex: 1200 }}>
 			<Toolbar sx={{ justifyContent: "space-between", px: 3, minHeight: "55px" }}>
@@ -75,7 +46,6 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
 					<IconButton onClick={toggleSidebar}>
 						<MenuIcon sx={{ color: "#000" }} />
 					</IconButton>
-
 					Create Your Team
 				</Box>
 
@@ -100,12 +70,12 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
 								}
 							}}
 						>
-							<Avatar alt='UserProfile' sx={{ width: 32, height: 32 }} src='/images/profileimage.png'></Avatar>
+							<Avatar alt='UserProfile' sx={{ width: 32, height: 32 }} src={user.picture}></Avatar>
 						</Badge>
 
 						<Box textAlign='left'>
 							<Typography fontSize={14} color='#0D0B52'>
-								{getUserNameFull(userName)}
+								{user.name}
 							</Typography>
 							<Typography fontSize={12} color='text.secondary'>
 								{getUserRole(userRole)}
