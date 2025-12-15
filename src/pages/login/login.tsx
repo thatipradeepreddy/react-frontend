@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import styles from "./login.module.css"
-import { apiLogin, apiLogout } from "../../api/api"
+import { apiLogin } from "../../api/api"
 import { useNavigate } from "react-router-dom"
 
 type UserProfile = {
@@ -17,34 +17,22 @@ export default function Login() {
 	const [password, setPassword] = useState("")
 	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState<string | null>(null)
-	const [user, setUser] = useState<UserProfile | null>(() => {
-		try {
-			const raw = localStorage.getItem("userProfile")
-			return raw ? JSON.parse(raw) : null
-		} catch {
-			return null
-		}
-	})
 
 	const navigate = useNavigate()
 
-	useEffect(() => {
-		try {
-			const raw = localStorage.getItem("userProfile")
-			if (raw) setUser(JSON.parse(raw))
-		} catch {}
-	}, [])
-
-	async function handleLogin(e: React.FormEvent) {
+	const handleLogin = async (e: React.FormEvent) => {
 		e.preventDefault()
 		setError(null)
+
 		if (!email || !password) {
 			setError("Email and password required")
 			return
 		}
+
 		setLoading(true)
 		try {
 			const data = await apiLogin({ email, password })
+
 			const profile: UserProfile = {
 				name: data.name,
 				email: data.email,
@@ -53,24 +41,12 @@ export default function Login() {
 				birthdate: data.birthdate,
 				gender: data.gender
 			}
+
 			localStorage.setItem("userProfile", JSON.stringify(profile))
-			setUser(profile)
-			navigate("/dashboard")
+			navigate("/players")
 		} catch (err: any) {
 			setError(err?.error || err?.message || "Login failed")
 		} finally {
-			setLoading(false)
-		}
-	}
-
-	async function handleLogout() {
-		setLoading(true)
-		try {
-			await apiLogout()
-		} catch {
-		} finally {
-			localStorage.removeItem("userProfile")
-			setUser(null)
 			setLoading(false)
 		}
 	}

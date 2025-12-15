@@ -3,6 +3,7 @@ import MenuIcon from "@mui/icons-material/Menu"
 import SearchIcon from "@mui/icons-material/Search"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { ProfileDialog } from "../profile/profileDialog"
 
 interface NavbarProps {
 	toggleSidebar: () => void
@@ -10,6 +11,8 @@ interface NavbarProps {
 
 const Navbar = ({ toggleSidebar }: NavbarProps) => {
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+	const [profileOpen, setProfileOpen] = useState(false)
+
 	const navigate = useNavigate()
 
 	const userRole = localStorage.getItem("userRole")
@@ -33,15 +36,11 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
 	const getUserRole = (userRole: string | null) => {
 		if (!userRole) return "Unknown Role"
 	}
-
 	const user = JSON.parse(localStorage.getItem("userProfile") || "{}")
-
-	console.log(user)
 
 	return (
 		<AppBar position='fixed' sx={{ bgcolor: "white", boxShadow: "none", zIndex: 1200 }}>
 			<Toolbar sx={{ justifyContent: "space-between", px: 3, minHeight: "55px" }}>
-				{/* Left side */}
 				<Box display='flex' alignItems='center' gap={2}>
 					<IconButton onClick={toggleSidebar}>
 						<MenuIcon sx={{ color: "#000" }} />
@@ -49,15 +48,12 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
 					Create Your Team
 				</Box>
 
-				{/* Right side */}
 				<Box display='flex' alignItems='center' gap={2}>
 					<IconButton>
 						<SearchIcon sx={{ color: "#0D0B52" }} />
 					</IconButton>
 
-					{/* Profile Section */}
 					<Box display='flex' alignItems='center' gap={1} sx={{ cursor: "pointer" }} onClick={handleProfileMenuOpen}>
-						{/* Avatar with green dot */}
 						<Badge
 							overlap='circular'
 							anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
@@ -83,7 +79,6 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
 						</Box>
 					</Box>
 
-					{/* Dropdown icon */}
 					<IconButton onClick={handleProfileMenuOpen}>
 						<Box
 							component='span'
@@ -98,7 +93,6 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
 					</IconButton>
 				</Box>
 
-				{/* Profile Menu */}
 				<Menu
 					anchorEl={anchorEl}
 					open={Boolean(anchorEl)}
@@ -112,11 +106,20 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
 						horizontal: "right"
 					}}
 				>
-					<MenuItem>Profile</MenuItem>
+					<MenuItem
+						onClick={() => {
+							setProfileOpen(true)
+							handleMenuClose()
+						}}
+					>
+						Profile
+					</MenuItem>
+
 					<Divider />
 					<MenuItem onClick={handleLogout}>Logout</MenuItem>
 				</Menu>
 			</Toolbar>
+			<ProfileDialog open={profileOpen} onClose={() => setProfileOpen(false)} user={user} onLogout={handleLogout} />
 		</AppBar>
 	)
 }

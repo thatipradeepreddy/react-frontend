@@ -40,6 +40,7 @@ const PlayersPage: React.FC = () => {
 			setLoading(true)
 			setError(null)
 			const data = await fetchPlayers()
+
 			setPlayers(data)
 		} catch (err: any) {
 			setError(err.message || "Failed to load players")

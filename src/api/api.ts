@@ -1,4 +1,4 @@
-const BASE = (import.meta.env.VITE_API_BASE_URL as string) || ""
+const BASE = import.meta.env.VITE_API_BASE_URL as string
 
 export type RegisterRequest = {
 	name: string
@@ -21,7 +21,7 @@ export async function apiRegister(body: RegisterRequest) {
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify(body)
 	})
-	const data = await res.json().catch(() => ({ error: "Invalid response" }))
+	const data = await res.json()
 	if (!res.ok) throw data
 	return data
 }
@@ -32,7 +32,7 @@ export async function apiConfirm(email: string, code: string) {
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify({ email, code })
 	})
-	const data = await res.json().catch(() => ({ error: "Invalid response" }))
+	const data = await res.json()
 	if (!res.ok) throw data
 	return data
 }
@@ -42,32 +42,20 @@ export async function apiLogin(body: LoginRequest) {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify(body)
-		// credentials: "include"
 	})
-	const data = await res.json().catch(() => ({ error: "Invalid response" }))
+
+	const data = await res.json()
 	if (!res.ok) throw data
+
+	localStorage.setItem("accessToken", data.AccessToken)
+	localStorage.setItem("refreshToken", data.RefreshToken)
+
+	localStorage.setItem("cognitoUsername", data.username)
+
 	return data
 }
 
 export async function apiLogout() {
-	const res = await fetch(`${BASE}/auth/logout`, {
-		method: "POST",
-		credentials: "include"
-	})
-	const data = await res.json().catch(() => ({}))
-	return data
-}
-
-export async function fetchWithAuth(input: RequestInfo, init?: RequestInit) {
-	const res = await fetch(`${BASE}${input}`, {
-		...init,
-		credentials: "include",
-		headers: {
-			"Content-Type": "application/json",
-			...(init && init.headers ? (init.headers as any) : {})
-		}
-	})
-	const data = await res.json().catch(() => ({}))
-	if (!res.ok) throw data
-	return data
+	localStorage.clear()
+	return true
 }

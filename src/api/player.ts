@@ -1,19 +1,16 @@
 import type { PlayerResponse, CreatePlayerPayload } from "../types/player.types"
-
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL as string) || ""
+import { fetchWithAuth } from "./refresh/fetchWithAuth"
 
 export async function fetchPlayers(): Promise<PlayerResponse[]> {
-	const res = await fetch(`${API_BASE_URL}/api/players`)
+	const res = await fetchWithAuth("/api/players")
 	if (!res.ok) throw new Error("Failed to fetch players")
 	return res.json()
 }
 
 export async function createPlayer(payload: CreatePlayerPayload): Promise<PlayerResponse> {
-	const res = await fetch(`${API_BASE_URL}/api/players`, {
+	const res = await fetchWithAuth("/api/players", {
 		method: "POST",
-		headers: {
-			"Content-Type": "application/json"
-		},
+		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify(payload)
 	})
 
@@ -30,13 +27,13 @@ export async function createPlayerImageUploadUrl(
 	fileName: string,
 	contentType: string
 ): Promise<{ uploadUrl: string; key: string }> {
-	const res = await fetch(`${API_BASE_URL}/api/players/${playerId}/image-url`, {
+	const res = await fetchWithAuth(`/api/players/${playerId}/image-url`, {
 		method: "POST",
-		headers: {
-			"Content-Type": "application/json"
-		},
+		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify({ fileName, contentType })
 	})
+
+	console.log(res, "////////////")
 
 	if (!res.ok) {
 		const text = await res.text()
@@ -49,22 +46,18 @@ export async function createPlayerImageUploadUrl(
 export async function uploadPlayerImageToS3(uploadUrl: string, file: File): Promise<void> {
 	const res = await fetch(uploadUrl, {
 		method: "PUT",
-		headers: {
-			"Content-Type": file.type
-		},
+		headers: { "Content-Type": file.type },
 		body: file
 	})
 
-	if (!res.ok) {
-		const text = await res.text()
-		throw new Error(text || "Failed to upload image to S3")
-	}
+	if (!res.ok) throw new Error("Failed to upload image")
 }
 
 export async function deletePlayer(playerId: string): Promise<void> {
-	const res = await fetch(`${API_BASE_URL}/api/players/${playerId}`, {
+	const res = await fetchWithAuth(`/api/players/${playerId}`, {
 		method: "DELETE"
 	})
+
 	if (!res.ok && res.status !== 204) {
 		const text = await res.text()
 		throw new Error(text || "Failed to delete player")
