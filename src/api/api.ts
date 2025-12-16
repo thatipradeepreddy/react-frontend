@@ -61,7 +61,7 @@ export async function apiLogout() {
 }
 
 export const apiForgotPassword = async (payload: { email: string }) => {
-	const res = await fetch("/forgot-password", {
+	const res = await fetch(`${BASE}/auth/forgot-password`, {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify(payload)
@@ -73,7 +73,7 @@ export const apiForgotPassword = async (payload: { email: string }) => {
 }
 
 export const apiConfirmForgotPassword = async (payload: { email: string; code: string; newPassword: string }) => {
-	const res = await fetch("/confirm-forgot-password", {
+	const res = await fetch(`${BASE}/auth/confirm-forgot-password`, {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify(payload)

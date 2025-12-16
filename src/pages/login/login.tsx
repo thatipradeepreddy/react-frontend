@@ -25,6 +25,11 @@ export default function Login() {
 
 	const navigate = useNavigate()
 
+	const showTempMessage = (setter: React.Dispatch<React.SetStateAction<string | null>>, message: string) => {
+		setter(message)
+		setTimeout(() => setter(null), 3000)
+	}
+
 	const handleLogin = async (e: React.FormEvent) => {
 		e.preventDefault()
 		setError(null)
@@ -50,7 +55,7 @@ export default function Login() {
 			localStorage.setItem("userProfile", JSON.stringify(profile))
 			navigate("/players")
 		} catch (err: any) {
-			setError(err?.error || err?.message || "Login failed")
+			showTempMessage(setError, err?.error || err?.message || "Login failed")
 		} finally {
 			setLoading(false)
 		}
@@ -67,11 +72,11 @@ export default function Login() {
 
 		setLoading(true)
 		try {
-			await apiForgotPassword({ email })
-			setSuccess("OTP sent to your email")
+			const res = await apiForgotPassword({ email })
+			showTempMessage(setSuccess, res.message)
 			setMode("reset")
 		} catch (err: any) {
-			setError(err?.error || "Failed to send OTP")
+			showTempMessage(setError, err?.error || err?.message || "Failed to send OTP")
 		} finally {
 			setLoading(false)
 		}
@@ -86,20 +91,19 @@ export default function Login() {
 			return
 		}
 
-		setLoading(true)
 		try {
-			await apiConfirmForgotPassword({
+			const res = await apiConfirmForgotPassword({
 				email,
 				code,
 				newPassword: password
 			})
 
-			setSuccess("Password reset successful. Please login.")
+			showTempMessage(setSuccess, res.message)
 			setMode("login")
 			setPassword("")
 			setCode("")
 		} catch (err: any) {
-			setError(err?.error || "Password reset failed")
+			showTempMessage(setError, err?.error || err?.message || "Password reset failed")
 		} finally {
 			setLoading(false)
 		}
@@ -192,6 +196,7 @@ export default function Login() {
 						</div>
 
 						{error && <div className={styles.error}>{error}</div>}
+						{success && <div className={styles.success}>{success}</div>}
 					</form>
 				</div>
 			)}
