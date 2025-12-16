@@ -59,3 +59,27 @@ export async function apiLogout() {
 	localStorage.clear()
 	return true
 }
+
+export const apiForgotPassword = async (payload: { email: string }) => {
+	const res = await fetch("/forgot-password", {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(payload)
+	})
+
+	const data = await res.json()
+	if (!res.ok) throw data
+	return data
+}
+
+export const apiConfirmForgotPassword = async (payload: { email: string; code: string; newPassword: string }) => {
+	const res = await fetch("/confirm-forgot-password", {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(payload)
+	})
+
+	const data = await res.json()
+	if (!res.ok) throw data
+	return data
+}

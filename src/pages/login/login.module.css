@@ -262,3 +262,29 @@
 		width: 100%;
 	}
 }
+
+.success {
+	margin-top: 12px;
+	padding: 8px 10px;
+	border-radius: 10px;
+	background-color: #ecfeff;
+	border: 1px solid #67e8f9;
+	color: #0369a1;
+	font-size: 0.9rem;
+}
+
+.link {
+	margin-top: 6px;
+	align-self: flex-end;
+	font-size: 0.85rem;
+	color: #0ea5e9;
+	text-decoration: underline;
+	cursor: pointer;
+	background: none;
+	border: none;
+	padding: 0;
+}
+
+.link:hover {
+	color: #0284c7;
+}

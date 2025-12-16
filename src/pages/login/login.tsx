@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import styles from "./login.module.css"
-import { apiLogin } from "../../api/api"
+import { apiConfirmForgotPassword, apiForgotPassword, apiLogin } from "../../api/api"
 import { useNavigate } from "react-router-dom"
 
 type UserProfile = {
@@ -12,11 +12,16 @@ type UserProfile = {
 	gender?: string
 }
 
+type Mode = "login" | "forgot" | "reset"
+
 export default function Login() {
+	const [mode, setMode] = useState<Mode>("login")
 	const [email, setEmail] = useState("")
 	const [password, setPassword] = useState("")
 	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState<string | null>(null)
+	const [code, setCode] = useState("")
+	const [success, setSuccess] = useState<string | null>(null)
 
 	const navigate = useNavigate()
 
@@ -51,45 +56,145 @@ export default function Login() {
 		}
 	}
 
+	const handleForgot = async (e: React.FormEvent) => {
+		e.preventDefault()
+		setError(null)
+
+		if (!email) {
+			setError("Email required")
+			return
+		}
+
+		setLoading(true)
+		try {
+			await apiForgotPassword({ email })
+			setSuccess("OTP sent to your email")
+			setMode("reset")
+		} catch (err: any) {
+			setError(err?.error || "Failed to send OTP")
+		} finally {
+			setLoading(false)
+		}
+	}
+
+	const handleReset = async (e: React.FormEvent) => {
+		e.preventDefault()
+		setError(null)
+
+		if (!email || !code || !password) {
+			setError("All fields are required")
+			return
+		}
+
+		setLoading(true)
+		try {
+			await apiConfirmForgotPassword({
+				email,
+				code,
+				newPassword: password
+			})
+
+			setSuccess("Password reset successful. Please login.")
+			setMode("login")
+			setPassword("")
+			setCode("")
+		} catch (err: any) {
+			setError(err?.error || "Password reset failed")
+		} finally {
+			setLoading(false)
+		}
+	}
+
 	return (
 		<div className={styles.container}>
-			<div className={styles.card}>
-				<h2 className={styles.title}>Welcome back</h2>
-				<p className={styles.subtitle}>Sign in to continue to your account</p>
+			{mode === "login" && (
+				<div className={styles.card}>
+					<h2 className={styles.title}>Welcome back</h2>
+					<p className={styles.subtitle}>Sign in to continue to your account</p>
 
-				<form className={styles.form} onSubmit={handleLogin}>
-					<label className={styles.label}>
-						Email
-						<input className={styles.input} type='email' value={email} onChange={e => setEmail(e.target.value)} />
-					</label>
-					<label className={styles.label}>
-						Password
-						<input
-							className={styles.input}
-							type='password'
-							value={password}
-							onChange={e => setPassword(e.target.value)}
-						/>
-					</label>
+					<form className={styles.form} onSubmit={handleLogin}>
+						<label className={styles.label}>
+							Email
+							<input className={styles.input} type='email' value={email} onChange={e => setEmail(e.target.value)} />
+						</label>
+						<label className={styles.label}>
+							Password
+							<input
+								className={styles.input}
+								type='password'
+								value={password}
+								onChange={e => setPassword(e.target.value)}
+							/>
+						</label>
 
-					<div className={styles.actions}>
-						<button className={styles.buttonPrimary} type='submit' disabled={loading}>
-							{loading ? "Signing in..." : "Sign in"}
+						<div className={styles.actions}>
+							<button className={styles.buttonPrimary} type='submit' disabled={loading}>
+								{loading ? "Signing in..." : "Sign in"}
+							</button>
+
+							<button
+								className={styles.buttonGhost}
+								type='button'
+								onClick={() => navigate("/register")}
+								disabled={loading}
+							>
+								Create account
+							</button>
+						</div>
+
+						{error && <div className={styles.error}>{error}</div>}
+					</form>
+
+					{mode === "login" && (
+						<button type='button' className={styles.link} onClick={() => setMode("forgot")}>
+							Forgot password?
 						</button>
+					)}
+				</div>
+			)}
+			{mode !== "login" && (
+				<div className={styles.card}>
+					<h2 className={styles.title}>Forgot Password</h2>
+					<p className={styles.subtitle}>Enter your email to receive a password reset code</p>
+					<form className={styles.form} onSubmit={mode === "forgot" ? handleForgot : handleReset}>
+						<label className={styles.label}>
+							Email
+							<input className={styles.input} type='email' value={email} onChange={e => setEmail(e.target.value)} />
+						</label>
 
-						<button
-							className={styles.buttonGhost}
-							type='button'
-							onClick={() => navigate("/register")}
-							disabled={loading}
-						>
-							Create account
-						</button>
-					</div>
+						{mode === "reset" && (
+							<>
+								<label className={styles.label}>
+									OTP
+									<input className={styles.input} value={code} onChange={e => setCode(e.target.value)} />
+								</label>
 
-					{error && <div className={styles.error}>{error}</div>}
-				</form>
-			</div>
+								<label className={styles.label}>
+									New Password
+									<input
+										className={styles.input}
+										type='password'
+										value={password}
+										onChange={e => setPassword(e.target.value)}
+									/>
+								</label>
+							</>
+						)}
+
+						<div className={styles.actions}>
+							<button className={styles.buttonPrimary} type='submit' disabled={loading}>
+								{mode === "forgot" ? "Send OTP" : "Reset password"}
+							</button>
+
+							<button type='button' className={styles.buttonGhost} onClick={() => setMode("login")}>
+								Back to login
+							</button>
+						</div>
+
+						{error && <div className={styles.error}>{error}</div>}
+					</form>
+				</div>
+			)}
 		</div>
 	)
 }
