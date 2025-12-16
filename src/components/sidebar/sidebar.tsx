@@ -1,4 +1,4 @@
-import { Drawer, Divider, ListItemIcon, ListItemText, Box, Typography } from "@mui/material"
+import { Drawer, ListItemIcon, ListItemText, Box, Typography } from "@mui/material"
 import { useNavigate } from "react-router-dom"
 
 interface SidebarProps {
