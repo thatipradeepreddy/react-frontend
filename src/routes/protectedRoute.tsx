@@ -1,8 +1,11 @@
 import { Navigate, Outlet } from "react-router-dom"
+import { useAuth } from "../utils/useAuth"
 
 export default function ProtectedRoute() {
-	const raw = localStorage.getItem("userProfile")
-	const isLoggedIn = !!raw
+	const { loading, isAuthenticated } = useAuth()
 
-	return isLoggedIn ? <Outlet /> : <Navigate to='/' replace />
+	if (loading) return null
+	if (!isAuthenticated) return <Navigate to='/' replace />
+
+	return <Outlet />
 }

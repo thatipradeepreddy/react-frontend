@@ -4,6 +4,7 @@ import SearchIcon from "@mui/icons-material/Search"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { ProfileDialog } from "../profile/profileDialog"
+import { apiLogout } from "../../api/api"
 
 interface NavbarProps {
 	toggleSidebar: () => void
@@ -28,9 +29,10 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
 	const handleLogout = () => {
 		setAnchorEl(null)
 
-		localStorage.clear()
-
-		navigate("/", { replace: true })
+		apiLogout().finally(() => {
+			localStorage.clear()
+			navigate("/", { replace: true })
+		})
 	}
 
 	const getUserRole = (userRole: string | null) => {

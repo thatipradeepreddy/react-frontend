@@ -33,8 +33,6 @@ export async function createPlayerImageUploadUrl(
 		body: JSON.stringify({ fileName, contentType })
 	})
 
-	console.log(res, "////////////")
-
 	if (!res.ok) {
 		const text = await res.text()
 		throw new Error(text || "Failed to create upload URL")

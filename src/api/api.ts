@@ -21,6 +21,7 @@ export async function apiRegister(body: RegisterRequest) {
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify(body)
 	})
+
 	const data = await res.json()
 	if (!res.ok) throw data
 	return data
@@ -32,6 +33,7 @@ export async function apiConfirm(email: string, code: string) {
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify({ email, code })
 	})
+
 	const data = await res.json()
 	if (!res.ok) throw data
 	return data
@@ -41,23 +43,21 @@ export async function apiLogin(body: LoginRequest) {
 	const res = await fetch(`${BASE}/auth/login`, {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify(body)
+		body: JSON.stringify(body),
+		credentials: "include"
 	})
 
 	const data = await res.json()
 	if (!res.ok) throw data
 
-	localStorage.setItem("accessToken", data.AccessToken)
-	localStorage.setItem("refreshToken", data.RefreshToken)
-
-	localStorage.setItem("cognitoUsername", data.username)
-
 	return data
 }
 
 export async function apiLogout() {
-	localStorage.clear()
-	return true
+	await fetch(`${BASE}/auth/logout`, {
+		method: "POST",
+		credentials: "include"
+	})
 }
 
 export const apiForgotPassword = async (payload: { email: string }) => {
