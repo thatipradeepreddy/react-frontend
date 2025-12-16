@@ -1,5 +1,5 @@
 import type { PlayerResponse, CreatePlayerPayload } from "../types/player.types"
-import { fetchWithAuth } from "./refresh/fetchWithAuth"
+import { fetchWithAuth } from "../utils/fetchWithAuth"
 
 export async function fetchPlayers(): Promise<PlayerResponse[]> {
 	const res = await fetchWithAuth("/api/players")

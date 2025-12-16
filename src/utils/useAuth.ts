@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { fetchWithAuth } from "../api/refresh/fetchWithAuth"
+import { fetchWithAuth } from "./fetchWithAuth"
 
 export function useAuth() {
 	const [loading, setLoading] = useState(true)
