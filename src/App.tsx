@@ -6,7 +6,6 @@ import Dashboard from "./pages/dashboard/dashboard"
 import Login from "./pages/login/login"
 import Register from "./pages/register/register"
 import PlayersPage from "./pages/players/players"
-import PlayerAIChat from "./pages/players/playerChat"
 
 function App() {
 	return (
@@ -20,7 +19,6 @@ function App() {
 					</Route>
 					<Route element={<ProtectedRoute />}>
 						<Route path='/players' element={<PlayersPage />} />
-						<Route path='/players/chat' element={<PlayerAIChat />} />
 					</Route>
 				</Route>
 			</Routes>

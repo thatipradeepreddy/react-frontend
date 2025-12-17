@@ -41,7 +41,7 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
 	const user = JSON.parse(localStorage.getItem("userProfile") || "{}")
 
 	return (
-		<AppBar position='fixed' sx={{ bgcolor: "white", boxShadow: "none", zIndex: 1200 }}>
+		<AppBar position='fixed' sx={{ bgcolor: "white", boxShadow: "none", zIndex: 1200, position: "absolute" }}>
 			<Toolbar sx={{ justifyContent: "space-between", px: 3, minHeight: "55px" }}>
 				<Box display='flex' alignItems='center' gap={2}>
 					<IconButton onClick={toggleSidebar}>
@@ -121,6 +121,7 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
 					<MenuItem onClick={handleLogout}>Logout</MenuItem>
 				</Menu>
 			</Toolbar>
+
 			<ProfileDialog open={profileOpen} onClose={() => setProfileOpen(false)} user={user} onLogout={handleLogout} />
 		</AppBar>
 	)
