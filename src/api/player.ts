@@ -62,9 +62,15 @@ export async function deletePlayer(playerId: string): Promise<void> {
 	}
 }
 
-export async function fetchAccessToken(): Promise<string> {
-	const res = await fetchWithAuth("/auth/token")
-	if (!res.ok) throw new Error("Failed to get token")
-	const data = await res.json()
-	return data.accessToken
+export async function updatePlayerStats(playerId: string, payload: { format: string; stats: any }): Promise<void> {
+	const res = await fetchWithAuth(`/api/players/${playerId}/stats`, {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(payload)
+	})
+
+	if (!res.ok) {
+		const text = await res.text()
+		throw new Error(text || "Failed to update stats")
+	}
 }

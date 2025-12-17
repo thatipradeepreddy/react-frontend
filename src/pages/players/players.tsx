@@ -2,6 +2,9 @@ import React, { useEffect, useState, type FormEvent } from "react"
 import { fetchPlayers, createPlayer, createPlayerImageUploadUrl, uploadPlayerImageToS3, deletePlayer } from "../../api/player"
 import type { PlayerRole, BattingStyle, BowlingStyle, CreatePlayerPayload, PlayerResponse } from "../../types/player.types"
 import styles from "./player.module.css"
+import Drawer from "@mui/material/Drawer"
+import MenuItem from "@mui/material/MenuItem"
+import PlayerStatsEditor from "../../components/player/playerStatEditor"
 
 const roles: PlayerRole[] = ["BATSMAN", "BOWLER", "ALL_ROUNDER", "WICKET_KEEPER"]
 const battingStyles: BattingStyle[] = ["RIGHT_HAND", "LEFT_HAND", "NONE"]
@@ -34,6 +37,8 @@ const PlayersPage: React.FC = () => {
 	const [formData, setFormData] = useState<CreatePlayerPayload>(initialForm)
 	const [imageFile, setImageFile] = useState<File | null>(null)
 	const [submitting, setSubmitting] = useState(false)
+	const [selectedPlayer, setSelectedPlayer] = useState<PlayerResponse | null>(null)
+	const [drawerOpen, setDrawerOpen] = useState(false)
 
 	const loadPlayers = async () => {
 		try {
@@ -111,6 +116,16 @@ const PlayersPage: React.FC = () => {
 		} catch (err: any) {
 			setError(err.message || "Failed to delete player")
 		}
+	}
+
+	const openDrawer = (player: PlayerResponse) => {
+		setSelectedPlayer(player)
+		setDrawerOpen(true)
+	}
+
+	const closeDrawer = () => {
+		setDrawerOpen(false)
+		setSelectedPlayer(null)
 	}
 
 	return (
@@ -267,7 +282,7 @@ const PlayersPage: React.FC = () => {
 
 				<div className={styles.playersGrid}>
 					{players.map(p => (
-						<div key={p.id} className={styles.playerCard}>
+						<div key={p.id} className={styles.playerCard} onClick={() => openDrawer(p)} style={{ cursor: "pointer" }}>
 							{p.imageUrl && <img src={p.imageUrl} alt={p.name} className={styles.playerImage} />}
 
 							<div className={styles.playerHeader}>
@@ -299,13 +314,34 @@ const PlayersPage: React.FC = () => {
 								</div>
 							</div>
 
-							<button onClick={() => handleDelete(p.id)} className={styles.deleteButton}>
+							<button
+								onClick={e => {
+									e.stopPropagation()
+									handleDelete(p.id)
+								}}
+								className={styles.deleteButton}
+							>
 								Delete
 							</button>
 						</div>
 					))}
 				</div>
 			</section>
+
+			<Drawer
+				anchor='right'
+				open={drawerOpen}
+				onClose={closeDrawer}
+				PaperProps={{
+					sx: {
+						width: 420,
+						p: 3,
+						backgroundColor: "#f9fafb"
+					}
+				}}
+			>
+				{selectedPlayer && <PlayerStatsEditor player={selectedPlayer} onClose={closeDrawer} onUpdated={loadPlayers} />}
+			</Drawer>
 		</div>
 	)
 }

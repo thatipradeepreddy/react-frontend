@@ -52,3 +52,5 @@ export interface CreatePlayerPayload {
 	teams?: string[]
 	isActive?: boolean
 }
+
+export type MatchFormat = "TEST" | "ODI" | "T20I" | "IPL" | "DOMESTIC" | "UNDER_19"
