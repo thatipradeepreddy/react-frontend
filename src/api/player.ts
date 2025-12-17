@@ -61,3 +61,10 @@ export async function deletePlayer(playerId: string): Promise<void> {
 		throw new Error(text || "Failed to delete player")
 	}
 }
+
+export async function fetchAccessToken(): Promise<string> {
+	const res = await fetchWithAuth("/auth/token")
+	if (!res.ok) throw new Error("Failed to get token")
+	const data = await res.json()
+	return data.accessToken
+}
