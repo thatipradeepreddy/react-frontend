@@ -3,6 +3,8 @@ import styles from "./playerChat.module.css"
 import { createPlayerSocket } from "../../utils/playerSocket"
 import { Box, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography } from "@mui/material"
 import CloseIcon from "@mui/icons-material/Close"
+import SendIcon from "@mui/icons-material/Send"
+import { Switch, FormControlLabel } from "@mui/material"
 
 type ChatMessage = {
 	from: "user" | "ai"
@@ -20,6 +22,7 @@ export default function PlayerAIChat(props: PlayerChatProps) {
 	const [messages, setMessages] = useState<ChatMessage[]>([])
 	const [loading, setLoading] = useState(false)
 	const [socketReady, setSocketReady] = useState(false)
+	const [enableAIInsights, setEnableAIInsights] = useState(true)
 
 	const socketRef = useRef<WebSocket | null>(null)
 
@@ -63,7 +66,8 @@ export default function PlayerAIChat(props: PlayerChatProps) {
 
 		socketRef.current.send(
 			JSON.stringify({
-				prompt: question
+				prompt: question,
+				enableAIInsights: enableAIInsights
 			})
 		)
 
@@ -114,11 +118,11 @@ export default function PlayerAIChat(props: PlayerChatProps) {
 				</DialogTitle>
 
 				<DialogContent sx={{ p: 0 }}>{renderMessages()}</DialogContent>
-				<DialogActions>
-					<div className={styles.form}>
+				<DialogActions sx={{ p: 1 }}>
+					<div className={styles.inputWrapper}>
 						<textarea
 							className={styles.textarea}
-							placeholder={socketReady ? "Ask about this player…" : "Connecting…"}
+							placeholder={enableAIInsights ? "Ask about player performance…" : "Ask anything…"}
 							value={question}
 							onChange={e => setQuestion(e.target.value)}
 							disabled={!socketReady || loading}
@@ -131,10 +135,41 @@ export default function PlayerAIChat(props: PlayerChatProps) {
 							}}
 						/>
 
-						<button className={styles.buttonPrimary} onClick={askAI} disabled={!socketReady || loading}>
-							Ask AI
-						</button>
+						<IconButton
+							onClick={askAI}
+							disabled={!socketReady || loading || !question.trim()}
+							sx={{
+								p: 0,
+								position: "absolute",
+								right: -13,
+								bottom: 21,
+								zIndex: 10
+							}}
+						>
+							<SendIcon
+								sx={{
+									fontSize: 28,
+									color: question.trim() && socketReady && !loading ? "#0ea5a2" : "#9ca3af",
+									transition: "color 0.15s ease",
+									"&:hover": {
+										color: question.trim() && socketReady && !loading ? "#0891b2" : "#9ca3af"
+									}
+								}}
+							/>
+						</IconButton>
 					</div>
+
+					<FormControlLabel
+						control={
+							<Switch
+								checked={enableAIInsights}
+								onChange={e => setEnableAIInsights(e.target.checked)}
+								color='primary'
+								sx={{ ml: 2 }}
+							/>
+						}
+						label=''
+					/>
 				</DialogActions>
 			</Dialog>
 		)

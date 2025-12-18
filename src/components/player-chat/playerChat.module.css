@@ -196,6 +196,11 @@
 	box-shadow: none;
 }
 
+.inputWrapper {
+	position: relative;
+	width: 100%;
+}
+
 @media (max-width: 640px) {
 	.card {
 		padding: 18px;
