@@ -23,8 +23,12 @@ export default function PlayerAIChat(props: PlayerChatProps) {
 	const [loading, setLoading] = useState(false)
 	const [socketReady, setSocketReady] = useState(false)
 	const [enableAIInsights, setEnableAIInsights] = useState(true)
+	const [modeToast, setModeToast] = useState<string | null>(null)
 
 	const socketRef = useRef<WebSocket | null>(null)
+
+	const bottomRef = useRef<HTMLDivElement | null>(null)
+	const inputRef = useRef<HTMLTextAreaElement | null>(null)
 
 	useEffect(() => {
 		const socket = createPlayerSocket()
@@ -56,6 +60,16 @@ export default function PlayerAIChat(props: PlayerChatProps) {
 		}
 	}, [])
 
+	useEffect(() => {
+		bottomRef.current?.scrollIntoView({ behavior: "smooth" })
+	}, [messages, loading])
+
+	useEffect(() => {
+		if (props.open) {
+			setTimeout(() => inputRef.current?.focus(), 100)
+		}
+	}, [props.open])
+
 	const askAI = () => {
 		if (!question.trim() || !socketRef.current || !socketReady || loading) {
 			return
@@ -72,6 +86,10 @@ export default function PlayerAIChat(props: PlayerChatProps) {
 		)
 
 		setQuestion("")
+
+		setTimeout(() => {
+			inputRef.current?.focus()
+		}, 0)
 	}
 
 	const renderMessages = () => {
@@ -85,6 +103,7 @@ export default function PlayerAIChat(props: PlayerChatProps) {
 					))}
 
 					{loading && <div className={styles.typing}>AI is analyzing…</div>}
+					<div ref={bottomRef} />
 				</div>
 			</div>
 		)
@@ -97,6 +116,8 @@ export default function PlayerAIChat(props: PlayerChatProps) {
 				onClose={props.onClose}
 				maxWidth='sm'
 				fullWidth
+				disableEnforceFocus
+				disableAutoFocus
 				PaperProps={{
 					sx: {
 						height: "70vh",
@@ -121,21 +142,25 @@ export default function PlayerAIChat(props: PlayerChatProps) {
 				<DialogActions sx={{ p: 1 }}>
 					<div className={styles.inputWrapper}>
 						<textarea
+							ref={inputRef}
 							className={styles.textarea}
+							autoFocus
 							placeholder={enableAIInsights ? "Ask about player performance…" : "Ask anything…"}
 							value={question}
 							onChange={e => setQuestion(e.target.value)}
-							disabled={!socketReady || loading}
 							rows={1}
 							onKeyDown={e => {
 								if (e.key === "Enter" && !e.shiftKey) {
 									e.preventDefault()
+									e.stopPropagation()
 									askAI()
 								}
 							}}
 						/>
 
 						<IconButton
+							tabIndex={-1}
+							onMouseDown={e => e.preventDefault()}
 							onClick={askAI}
 							disabled={!socketReady || loading || !question.trim()}
 							sx={{
@@ -163,7 +188,14 @@ export default function PlayerAIChat(props: PlayerChatProps) {
 						control={
 							<Switch
 								checked={enableAIInsights}
-								onChange={e => setEnableAIInsights(e.target.checked)}
+								onChange={e => {
+									const checked = e.target.checked
+									setEnableAIInsights(checked)
+
+									setModeToast(checked ? "AI Player Insights enabled" : "Switched to normal chat mode")
+
+									setTimeout(() => setModeToast(null), 2000)
+								}}
 								color='primary'
 								sx={{ ml: 2 }}
 							/>
@@ -171,6 +203,7 @@ export default function PlayerAIChat(props: PlayerChatProps) {
 						label=''
 					/>
 				</DialogActions>
+				{modeToast && <div className={styles.toast}>{modeToast}</div>}
 			</Dialog>
 		)
 	}
