@@ -4,7 +4,6 @@ import SearchIcon from "@mui/icons-material/Search"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { ProfileDialog } from "../profile/profileDialog"
-import { apiLogout } from "../../api/api"
 
 interface NavbarProps {
 	toggleSidebar: () => void
@@ -13,6 +12,7 @@ interface NavbarProps {
 const Navbar = ({ toggleSidebar }: NavbarProps) => {
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 	const [profileOpen, setProfileOpen] = useState(false)
+	const [logout, { isLoading: loggingOut }] = useLogoutMutation()
 
 	const navigate = useNavigate()
 
@@ -26,13 +26,17 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
 		setAnchorEl(null)
 	}
 
-	const handleLogout = () => {
+	const handleLogout = async () => {
 		setAnchorEl(null)
 
-		apiLogout().finally(() => {
+		try {
+			await logout().unwrap()
+		} catch (err) {
+			console.error("Logout failed", err)
+		} finally {
 			localStorage.clear()
 			navigate("/", { replace: true })
-		})
+		}
 	}
 
 	const getUserRole = (userRole: string | null) => {
@@ -128,3 +132,6 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
 }
 
 export default Navbar
+function useLogoutMutation(): [any, { isLoading: any }] {
+	throw new Error("Function not implemented.")
+}

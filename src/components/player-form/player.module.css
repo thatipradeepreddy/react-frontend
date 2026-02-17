@@ -1,0 +1,405 @@
+.page {
+	min-height: 100vh;
+	margin: 0 auto;
+	padding: 24px 20px 32px;
+	background: radial-gradient(circle at top, #e0f2fe 0, #f8fafc 45%, #f1f5f9 100%);
+	font-family:
+		system-ui,
+		-apple-system,
+		BlinkMacSystemFont,
+		"Segoe UI",
+		sans-serif;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+.pageHeader {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.pageTitle {
+	margin: 0;
+	font-size: 1.9rem;
+	font-weight: 650;
+	color: #0f172a;
+	letter-spacing: -0.02em;
+}
+
+.pageSubtitle {
+	margin: 0;
+	font-size: 0.95rem;
+	color: #6b7280;
+}
+
+.sectionCard {
+	margin: 0;
+	padding: 18px 20px 20px;
+	border-radius: 18px;
+	border: 1px solid #e5e7eb;
+	background-color: #ffffff;
+	box-shadow:
+		0 16px 40px rgba(15, 23, 42, 0.08),
+		0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.sectionHeader {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	margin-bottom: 14px;
+}
+
+.sectionTitle {
+	margin: 0;
+	font-size: 1.3rem;
+	font-weight: 600;
+	color: #0f172a;
+}
+
+.sectionSubtitle {
+	margin: 0;
+	font-size: 0.85rem;
+	color: #6b7280;
+}
+
+.form {
+	display: grid;
+	gap: 0.85rem;
+}
+
+.rowTwo,
+.rowThree,
+.rowFour {
+	display: grid;
+	gap: 0.85rem;
+}
+
+.rowTwo {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.rowThree {
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.rowFour {
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.fieldLabel {
+	display: flex;
+	flex-direction: column;
+	font-size: 0.9rem;
+	color: #111827;
+	gap: 0.3rem;
+	font-weight: 500;
+}
+
+.input,
+.select {
+	padding: 0.55rem 0.7rem;
+	border-radius: 10px;
+	border: 1px solid #e5e7eb;
+	font-size: 0.9rem;
+	background-color: #f9fafb;
+	transition:
+		border-color 0.15s ease,
+		box-shadow 0.15s ease,
+		background-color 0.15s ease,
+		transform 0.08s ease;
+	outline: none;
+}
+
+.input:focus,
+.select:focus {
+	outline: none;
+	border-color: #0ea5a2;
+	background-color: #ffffff;
+	box-shadow:
+		0 0 0 1px rgba(14, 165, 160, 0.2),
+		0 8px 18px rgba(15, 23, 42, 0.06);
+	transform: translateY(-1px);
+}
+
+.input::placeholder,
+.select::placeholder {
+	color: #9ca3af;
+}
+
+.imageActiveRow {
+	display: flex;
+	gap: 1rem;
+	align-items: center;
+	flex-wrap: wrap;
+	margin-top: 0.2rem;
+}
+
+.fileLabel {
+	flex: 1;
+}
+
+.fileInput {
+	margin-top: 0.25rem;
+	font-size: 0.85rem;
+}
+
+.checkboxLabel {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.45rem;
+	font-size: 0.9rem;
+	color: #374151;
+}
+
+.checkboxLabel input {
+	width: 16px;
+	height: 16px;
+}
+
+.primaryButton {
+	margin-top: 0.6rem;
+	padding: 0.58rem 1.4rem;
+	border-radius: 999px;
+	border: none;
+	font-size: 0.95rem;
+	font-weight: 600;
+	background: linear-gradient(135deg, #0ea5e9, #0ea5a2);
+	color: #ffffff;
+	cursor: pointer;
+	width: fit-content;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow:
+		0 10px 20px rgba(14, 165, 233, 0.25),
+		0 2px 4px rgba(15, 23, 42, 0.15);
+	transition:
+		transform 0.12s ease,
+		box-shadow 0.12s ease,
+		opacity 0.12s ease,
+		filter 0.12s ease;
+}
+
+.primaryButton:hover:not(:disabled) {
+	transform: translateY(-1px);
+	box-shadow:
+		0 14px 26px rgba(14, 165, 233, 0.3),
+		0 4px 6px rgba(15, 23, 42, 0.18);
+	filter: brightness(1.03);
+}
+
+.primaryButton:active:not(:disabled) {
+	transform: translateY(0);
+	box-shadow:
+		0 6px 14px rgba(14, 165, 233, 0.2),
+		0 1px 3px rgba(15, 23, 42, 0.2);
+}
+
+.primaryButton:disabled {
+	opacity: 0.6;
+	cursor: default;
+	box-shadow: none;
+}
+
+.errorText {
+	color: #b91c1c;
+	margin-top: 0.5rem;
+	font-size: 0.9rem;
+	padding: 8px 10px;
+	border-radius: 10px;
+	background-color: #fef2f2;
+	border: 1px solid #fecaca;
+}
+
+.helperText {
+	margin-top: 0.4rem;
+	font-size: 0.9rem;
+	color: #6b7280;
+}
+
+.playersTitle {
+	font-size: 1.25rem;
+	font-weight: 600;
+	color: #0f172a;
+	margin: 0;
+}
+
+.playersGrid {
+	margin-top: 0.8rem;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+	gap: 1rem;
+}
+
+.playerCard {
+	border-radius: 16px;
+	padding: 0.9rem 0.9rem 0.85rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.6rem;
+	background-color: #ffffff;
+	border: 1px solid #e5e7eb;
+	box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+	transition:
+		transform 0.12s ease,
+		box-shadow 0.12s ease,
+		border-color 0.12s ease;
+}
+
+.playerCard:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 16px 32px rgba(15, 23, 42, 0.08);
+	border-color: #dbeafe;
+}
+
+.playerImage {
+	width: 100%;
+	height: 170px;
+	object-fit: cover;
+	border-radius: 12px;
+	margin-bottom: 0.4rem;
+}
+
+.playerHeader {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+}
+
+.playerNameRole {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.6rem;
+}
+
+.playerName {
+	font-size: 1rem;
+	font-weight: 600;
+	color: #0f172a;
+}
+
+.rolePill {
+	font-size: 0.75rem;
+	padding: 0.18rem 0.55rem;
+	border-radius: 999px;
+	background: #eff6ff;
+	color: #1d4ed8;
+	font-weight: 500;
+	white-space: nowrap;
+}
+
+.playerMetaMuted {
+	font-size: 0.85rem;
+	color: #6b7280;
+}
+
+.playerStatsRow {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.65rem;
+	margin-top: 0.3rem;
+}
+
+.statItem {
+	display: flex;
+	flex-direction: column;
+	font-size: 0.8rem;
+}
+
+.statLabel {
+	color: #9ca3af;
+}
+
+.statValue {
+	font-size: 0.9rem;
+	font-weight: 600;
+	color: #111827;
+}
+
+.activeTag,
+.inactiveTag {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0.1rem 0.55rem;
+	border-radius: 999px;
+	font-size: 0.8rem;
+	font-weight: 600;
+}
+
+.activeTag {
+	background-color: #ecfdf5;
+	color: #16a34a;
+}
+
+.inactiveTag {
+	background-color: #fef2f2;
+	color: #b91c1c;
+}
+
+.deleteButton {
+	margin-top: 0.5rem;
+	align-self: flex-start;
+	background: #ef4444;
+	color: #fff;
+	border: none;
+	padding: 0.38rem 0.85rem;
+	border-radius: 999px;
+	cursor: pointer;
+	font-size: 0.82rem;
+	font-weight: 500;
+	transition:
+		background-color 0.12s ease,
+		transform 0.08s ease,
+		box-shadow 0.12s ease;
+	box-shadow: 0 6px 14px rgba(248, 113, 113, 0.35);
+}
+
+.deleteButton:hover {
+	background-color: #dc2626;
+	transform: translateY(-1px);
+	box-shadow: 0 10px 20px rgba(239, 68, 68, 0.45);
+}
+
+.deleteButton:active {
+	transform: translateY(0);
+	box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4);
+}
+
+@media (max-width: 900px) {
+	.rowFour {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 720px) {
+	.page {
+		padding: 18px 14px 24px;
+	}
+
+	.sectionCard {
+		padding: 16px 14px 18px;
+	}
+
+	.rowThree {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.rowTwo {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media (max-width: 520px) {
+	.rowFour {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.playerCard {
+		padding: 0.8rem;
+	}
+}

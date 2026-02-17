@@ -1,87 +1,53 @@
-const BASE = import.meta.env.VITE_API_BASE_URL as string
+import { fetchBaseQuery } from "@reduxjs/toolkit/query/react"
+import type { BaseQueryFn } from "@reduxjs/toolkit/query"
+import type { FetchArgs, FetchBaseQueryError } from "@reduxjs/toolkit/query"
 
-export type RegisterRequest = {
-	name: string
-	email: string
-	password: string
-	phoneNumber?: string
-	birthdate?: string
-	gender?: string
-	picture?: string
+const API_BASE = import.meta.env.VITE_API_BASE_URL as string
+
+const baseQuery = fetchBaseQuery({
+	baseUrl: API_BASE,
+	credentials: "include"
+})
+
+let isRefreshing = false
+let refreshPromise: Promise<Response> | null = null
+
+export const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
+	args,
+	api,
+	extraOptions
+) => {
+	let result = await baseQuery(args, api, extraOptions)
+
+	if (result.error?.status !== 401) {
+		return result
+	}
+
+	if (!isRefreshing) {
+		isRefreshing = true
+		refreshPromise = fetch(`${API_BASE}/auth/refresh`, {
+			method: "POST",
+			credentials: "include"
+		})
+	}
+
+	try {
+		const refreshResult = await refreshPromise
+
+		isRefreshing = false
+		refreshPromise = null
+
+		if (!refreshResult || !refreshResult.ok) {
+			window.location.replace("/")
+			return result
+		}
+
+		result = await baseQuery(args, api, extraOptions)
+		return result
+	} catch (err) {
+		isRefreshing = false
+		refreshPromise = null
+		window.location.replace("/")
+		return result
+	}
 }
-
-export type LoginRequest = {
-	email: string
-	password: string
-}
-
-export async function apiRegister(body: RegisterRequest) {
-	const res = await fetch(`${BASE}/auth/register`, {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify(body)
-	})
-
-	const data = await res.json()
-	if (!res.ok) throw data
-	return data
-}
-
-export async function apiConfirm(email: string, code: string) {
-	const res = await fetch(`${BASE}/auth/confirm`, {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify({ email, code })
-	})
-
-	const data = await res.json()
-	if (!res.ok) throw data
-	return data
-}
-
-export async function apiLogin(body: LoginRequest) {
-	const res = await fetch(`${BASE}/auth/login`, {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify(body),
-		credentials: "include"
-	})
-
-	const data = await res.json()
-	if (!res.ok) throw data
-
-	return data
-}
-
-export async function apiLogout() {
-	await fetch(`${BASE}/auth/logout`, {
-		method: "POST",
-		credentials: "include"
-	})
-}
-
-export const apiForgotPassword = async (payload: { email: string }) => {
-	const res = await fetch(`${BASE}/auth/forgot-password`, {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify(payload)
-	})
-
-	const data = await res.json()
-	if (!res.ok) throw data
-	return data
-}
-
-export const apiConfirmForgotPassword = async (payload: { email: string; code: string; newPassword: string }) => {
-	const res = await fetch(`${BASE}/auth/confirm-forgot-password`, {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify(payload)
-	})
-
-	const data = await res.json()
-	if (!res.ok) throw data
-	return data
-}
-
-

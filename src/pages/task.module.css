@@ -1,0 +1,59 @@
+* {
+	box-sizing: border-box;
+}
+
+.page {
+	width: 100vw;
+	margin: auto;
+	font-family: Arial, Helvetica, sans-serif;
+	color: white;
+}
+
+.header {
+	height: 20vh;
+	background-color: green;
+	/* margin-bottom: 20px; */
+}
+
+.main {
+	display: flex;
+	/* gap: 15px; */
+	height: 60vh;
+	/* margin-bottom: 20px; */
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+.sidebar {
+	width: 20vw;
+	/* height: 100vh; */
+	margin-right: 10px;
+	background-color: black;
+}
+
+.section {
+	width: 80vw;
+	background-color: red;
+}
+
+.footer {
+	height: 20vh;
+	background-color: antiquewhite;
+}
+
+@media (max-width: 700px) {
+	.main {
+		flex-direction: column;
+		height: 100vh;
+	}
+	.sidebar {
+		width: 100vw;
+		/* height: auto; */
+		height: 60vh;
+	}
+	.section {
+		width: 100vw;
+		/* height: auto; */
+		height: 60vh;
+	}
+}

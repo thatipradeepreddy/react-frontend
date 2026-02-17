@@ -5,7 +5,7 @@ import ProtectedRoute from "./routes/protectedRoute"
 import Dashboard from "./pages/dashboard/dashboard"
 import Login from "./pages/login/login"
 import Register from "./pages/register/register"
-import PlayersPage from "./pages/players/players"
+import { PlayersPage } from "./pages/players/players"
 
 function App() {
 	return (

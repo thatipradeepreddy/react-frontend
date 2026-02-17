@@ -1,8 +1,8 @@
 import React, { useState, useRef } from "react"
 import styles from "./register.module.css"
-import { apiRegister, apiConfirm } from "../../api/api"
 import { requestRegisterImagePresign, uploadToS3WithProgress } from "../../api/s3Upload"
 import axios from "axios"
+import { useConfirmRegisterMutation, useRegisterMutation } from "../../services/auth.api"
 
 type FormState = {
 	name: string
@@ -38,6 +38,9 @@ export default function Register() {
 	const abortRef = useRef<AbortController | null>(null)
 	const MAX_BYTES = Number(import.meta.env.VITE_MAX_PROFILE_IMAGE_BYTES || 1048576)
 
+	const [register, { isLoading: registering }] = useRegisterMutation()
+	const [confirmRegister, { isLoading: confirming }] = useConfirmRegisterMutation()
+
 	const update = <K extends keyof FormState>(key: K, value: FormState[K]) => {
 		setForm(prev => ({ ...prev, [key]: value }))
 	}
@@ -57,9 +60,8 @@ export default function Register() {
 			return
 		}
 
-		setLoading(true)
 		try {
-			await apiRegister({
+			await register({
 				name: form.name,
 				email: form.email,
 				password: form.password,
@@ -67,33 +69,34 @@ export default function Register() {
 				birthdate: form.birthdate || undefined,
 				gender: form.gender || undefined,
 				picture: form.picture
-			})
+			}).unwrap()
 
 			setSuccess("Signup initiated. Check your email or phone for the verification code.")
 			setShowConfirm(true)
 		} catch (err: any) {
-			setError(err?.error || err?.message || "Registration failed")
-		} finally {
-			setLoading(false)
+			setError(err?.data?.message || err?.message || "Registration failed")
 		}
 	}
 
 	const handleConfirm = async (e: React.FormEvent) => {
 		e.preventDefault()
 		setConfirmError(null)
+
 		if (!code) {
 			setConfirmError("Please enter the verification code.")
 			return
 		}
-		setConfirmLoading(true)
+
 		try {
-			await apiConfirm(form.email, code)
+			await confirmRegister({
+				email: form.email,
+				code
+			}).unwrap()
+
 			setSuccess("Account confirmed. You can now log in.")
 			setShowConfirm(false)
 		} catch (err: any) {
-			setConfirmError(err?.error || err?.message || "Confirmation failed")
-		} finally {
-			setConfirmLoading(false)
+			setConfirmError(err?.data?.message || err?.message || "Confirmation failed")
 		}
 	}
 

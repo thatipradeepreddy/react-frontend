@@ -1,10 +1,13 @@
-import React, { useEffect, useState, type FormEvent } from "react"
-import { fetchPlayers, createPlayer, createPlayerImageUploadUrl, uploadPlayerImageToS3, deletePlayer } from "../../api/player"
+import React, { type FormEvent, useState } from "react"
 import type { PlayerRole, BattingStyle, BowlingStyle, CreatePlayerPayload, PlayerResponse } from "../../types/player.types"
 import styles from "./player.module.css"
 import Drawer from "@mui/material/Drawer"
-import MenuItem from "@mui/material/MenuItem"
+import { Box, CircularProgress } from "@mui/material"
 import PlayerStatsEditor from "../../components/player/playerStatEditor"
+import AddPlayerForm from "../../components/player-form/addPlayerForm"
+import PlayersList from "../../components/player-form/playerList"
+import { useGetPlayersQuery, useCreatePlayerMutation, useDeletePlayerMutation } from "../../services/player.api"
+import { createPlayerImageUploadUrl, uploadPlayerImageToS3 } from "../../api/player"
 
 const roles: PlayerRole[] = ["BATSMAN", "BOWLER", "ALL_ROUNDER", "WICKET_KEEPER"]
 const battingStyles: BattingStyle[] = ["RIGHT_HAND", "LEFT_HAND", "NONE"]
@@ -29,39 +32,18 @@ const initialForm: CreatePlayerPayload = {
 	isActive: true
 }
 
-const PlayersPage: React.FC = () => {
-	const [players, setPlayers] = useState<PlayerResponse[]>([])
-	const [loading, setLoading] = useState(false)
-	const [error, setError] = useState<string | null>(null)
+export function PlayersPage() {
+	const { data: players = [], isLoading, isFetching, isError, error } = useGetPlayersQuery()
+	const [createPlayerApi, { isLoading: isCreating }] = useCreatePlayerMutation()
+	const [deletePlayerApi, { isLoading: isDeleting }] = useDeletePlayerMutation()
 
 	const [formData, setFormData] = useState<CreatePlayerPayload>(initialForm)
 	const [imageFile, setImageFile] = useState<File | null>(null)
-	const [submitting, setSubmitting] = useState(false)
 	const [selectedPlayer, setSelectedPlayer] = useState<PlayerResponse | null>(null)
 	const [drawerOpen, setDrawerOpen] = useState(false)
 
-	const loadPlayers = async () => {
-		try {
-			setLoading(true)
-			setError(null)
-			const data = await fetchPlayers()
-
-			setPlayers(data)
-		} catch (err: any) {
-			setError(err.message || "Failed to load players")
-		} finally {
-			setLoading(false)
-		}
-	}
-
-	useEffect(() => {
-		loadPlayers()
-	}, [])
-
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-		const target = e.target as HTMLInputElement | HTMLSelectElement
-		const { name, value, type } = target
-		const checked = (target as HTMLInputElement).checked
+		const { name, value, type, checked } = e.target as HTMLInputElement
 		setFormData(prev => ({
 			...prev,
 			[name]: type === "checkbox" ? checked : value
@@ -77,45 +59,27 @@ const PlayersPage: React.FC = () => {
 	}
 
 	const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const file = e.target.files?.[0] || null
-		setImageFile(file)
+		setImageFile(e.target.files?.[0] || null)
 	}
 
 	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault()
 
-		try {
-			setSubmitting(true)
-			setError(null)
+		const player = await createPlayerApi(formData).unwrap()
 
-			const created = await createPlayer(formData)
+		if (imageFile) {
+			const { uploadUrl } = await createPlayerImageUploadUrl(player.id, imageFile.name, imageFile.type)
 
-			if (imageFile) {
-				const { uploadUrl } = await createPlayerImageUploadUrl(created.id, imageFile.name, imageFile.type)
-
-				await uploadPlayerImageToS3(uploadUrl, imageFile)
-			}
-
-			await loadPlayers()
-
-			setFormData(initialForm)
-			setImageFile(null)
-		} catch (err: any) {
-			console.error(err)
-			setError(err.message || "Failed to create player")
-		} finally {
-			setSubmitting(false)
+			await uploadPlayerImageToS3(uploadUrl, imageFile)
 		}
+
+		setFormData(initialForm)
+		setImageFile(null)
 	}
 
 	const handleDelete = async (id: string) => {
 		if (!window.confirm("Delete this player?")) return
-		try {
-			await deletePlayer(id)
-			await loadPlayers()
-		} catch (err: any) {
-			setError(err.message || "Failed to delete player")
-		}
+		await deletePlayerApi(id)
 	}
 
 	const openDrawer = (player: PlayerResponse) => {
@@ -128,222 +92,78 @@ const PlayersPage: React.FC = () => {
 		setSelectedPlayer(null)
 	}
 
-	return (
-		<div className={styles.page}>
-			<div className={styles.pageHeader}>
-				<h1 className={styles.pageTitle}>Cricket Players</h1>
-				<p className={styles.pageSubtitle}>Create, manage and track your team profiles</p>
-			</div>
-
-			<section className={styles.sectionCard}>
-				<div className={styles.sectionHeader}>
-					<h2 className={styles.sectionTitle}>Add Player</h2>
-					<p className={styles.sectionSubtitle}>Fill in the details to create a new player</p>
-				</div>
-
-				<form onSubmit={handleSubmit} className={styles.form}>
-					<div className={styles.rowTwo}>
-						<label className={styles.fieldLabel}>
-							Name
-							<input name='name' value={formData.name} onChange={handleChange} required className={styles.input} />
-						</label>
-
-						<label className={styles.fieldLabel}>
-							Village
-							<input
-								name='village'
-								value={formData.village}
-								onChange={handleChange}
-								required
-								className={styles.input}
-							/>
-						</label>
-					</div>
-
-					<div className={styles.rowThree}>
-						<label className={styles.fieldLabel}>
-							Role
-							<select name='role' value={formData.role} onChange={handleChange} className={styles.select}>
-								{roles.map(r => (
-									<option key={r} value={r}>
-										{r}
-									</option>
-								))}
-							</select>
-						</label>
-
-						<label className={styles.fieldLabel}>
-							Batting Style
-							<select
-								name='battingStyle'
-								value={formData.battingStyle}
-								onChange={handleChange}
-								className={styles.select}
-							>
-								{battingStyles.map(b => (
-									<option key={b} value={b}>
-										{b}
-									</option>
-								))}
-							</select>
-						</label>
-
-						<label className={styles.fieldLabel}>
-							Bowling Style
-							<select
-								name='bowlingStyle'
-								value={formData.bowlingStyle}
-								onChange={handleChange}
-								className={styles.select}
-							>
-								{bowlingStyles.map(b => (
-									<option key={b} value={b}>
-										{b}
-									</option>
-								))}
-							</select>
-						</label>
-					</div>
-
-					<div className={styles.rowFour}>
-						<label className={styles.fieldLabel}>
-							Age
-							<input
-								name='age'
-								type='number'
-								value={formData.age ?? ""}
-								onChange={handleNumberChange}
-								className={styles.input}
-							/>
-						</label>
-
-						<label className={styles.fieldLabel}>
-							Matches
-							<input
-								name='matches'
-								type='number'
-								value={formData.matches ?? ""}
-								onChange={handleNumberChange}
-								className={styles.input}
-							/>
-						</label>
-
-						<label className={styles.fieldLabel}>
-							Runs
-							<input
-								name='runs'
-								type='number'
-								value={formData.runs ?? ""}
-								onChange={handleNumberChange}
-								className={styles.input}
-							/>
-						</label>
-
-						<label className={styles.fieldLabel}>
-							Wickets
-							<input
-								name='wickets'
-								type='number'
-								value={formData.wickets ?? ""}
-								onChange={handleNumberChange}
-								className={styles.input}
-							/>
-						</label>
-					</div>
-
-					<div className={styles.imageActiveRow}>
-						<label className={`${styles.fieldLabel} ${styles.fileLabel}`}>
-							Profile Image
-							<input type='file' accept='image/*' onChange={handleImageChange} className={styles.fileInput} />
-						</label>
-
-						<label className={styles.checkboxLabel}>
-							<input type='checkbox' name='isActive' checked={!!formData.isActive} onChange={handleChange} />
-							<span>Active</span>
-						</label>
-					</div>
-
-					<button type='submit' disabled={submitting} className={styles.primaryButton}>
-						{submitting ? "Saving..." : "Create Player"}
-					</button>
-
-					{error && <p className={styles.errorText}>{error}</p>}
-				</form>
-			</section>
-
-			<section className={styles.sectionCard}>
-				<div className={styles.sectionHeader}>
-					<h2 className={styles.playersTitle}>Players</h2>
-					<p className={styles.sectionSubtitle}>Overview of all players in your squad</p>
-				</div>
-
-				{loading && <p className={styles.helperText}>Loading...</p>}
-				{!loading && players.length === 0 && <p className={styles.helperText}>No players yet.</p>}
-
-				<div className={styles.playersGrid}>
-					{players.map(p => (
-						<div key={p.id} className={styles.playerCard} onClick={() => openDrawer(p)} style={{ cursor: "pointer" }}>
-							{p.imageUrl && <img src={p.imageUrl} alt={p.name} className={styles.playerImage} />}
-
-							<div className={styles.playerHeader}>
-								<div className={styles.playerNameRole}>
-									<div className={styles.playerName}>{p.name}</div>
-									<span className={styles.rolePill}>{p.role}</span>
-								</div>
-								<div className={styles.playerMetaMuted}>Village: {p.village}</div>
-							</div>
-
-							<div className={styles.playerStatsRow}>
-								{p.runs !== undefined && (
-									<div className={styles.statItem}>
-										<span className={styles.statLabel}>Runs</span>
-										<span className={styles.statValue}>{p.runs}</span>
-									</div>
-								)}
-								{p.wickets !== undefined && (
-									<div className={styles.statItem}>
-										<span className={styles.statLabel}>Wickets</span>
-										<span className={styles.statValue}>{p.wickets}</span>
-									</div>
-								)}
-								<div className={styles.statItem}>
-									<span className={styles.statLabel}>Active</span>
-									<span className={p.isActive ? styles.activeTag : styles.inactiveTag}>
-										{p.isActive ? "Yes" : "No"}
-									</span>
-								</div>
-							</div>
-
-							<button
-								onClick={e => {
-									e.stopPropagation()
-									handleDelete(p.id)
-								}}
-								className={styles.deleteButton}
-							>
-								Delete
-							</button>
-						</div>
-					))}
-				</div>
-			</section>
-
-			<Drawer
-				anchor='right'
-				open={drawerOpen}
-				onClose={closeDrawer}
-				PaperProps={{
-					sx: {
-						width: 420,
-						p: 3,
-						backgroundColor: "#f9fafb"
-					}
-				}}
-			>
-				{selectedPlayer && <PlayerStatsEditor player={selectedPlayer} onClose={closeDrawer} onUpdated={loadPlayers} />}
-			</Drawer>
+	const renderHeader = () => (
+		<div className={styles.pageHeader}>
+			<h1 className={styles.pageTitle}>Cricket Players</h1>
+			<p className={styles.pageSubtitle}>Total Players: {players.length}</p>
 		</div>
 	)
-}
 
-export default PlayersPage
+	const renderAddPlayerForm = () => (
+		<AddPlayerForm
+			formData={formData}
+			roles={roles}
+			battingStyles={battingStyles}
+			bowlingStyles={bowlingStyles}
+			submitting={isCreating}
+			error={null}
+			onChange={handleChange}
+			onNumberChange={handleNumberChange}
+			onImageChange={handleImageChange}
+			onSubmit={handleSubmit}
+		/>
+	)
+
+	const renderPlayersList = () => (
+		<PlayersList players={players} loading={isLoading} onOpen={openDrawer} onDelete={handleDelete} />
+	)
+
+	const renderDrawer = () => (
+		<Drawer
+			anchor='right'
+			open={drawerOpen}
+			onClose={closeDrawer}
+			PaperProps={{
+				sx: { width: 420, p: 3, backgroundColor: "#f9fafb" }
+			}}
+		>
+			{selectedPlayer && (
+				<PlayerStatsEditor
+					player={selectedPlayer}
+					onClose={closeDrawer}
+					onUpdated={function (): void {
+						throw new Error("Function not implemented.")
+					}}
+				/>
+			)}
+		</Drawer>
+	)
+
+	return (
+		<>
+			{(isLoading || isFetching || isCreating || isDeleting) && (
+				<Box
+					sx={{
+						position: "fixed",
+						inset: 0,
+						display: "flex",
+						justifyContent: "center",
+						alignItems: "center",
+						backgroundColor: "rgba(255,255,255,0.6)",
+						zIndex: 1300
+					}}
+				>
+					<CircularProgress />
+				</Box>
+			)}
+
+			<div className={styles.page}>
+				{renderHeader()}
+				{isError && <p className={styles.errorText}>{(error as Error)?.message || "Failed to load players"}</p>}
+				{renderAddPlayerForm()}
+				{renderPlayersList()}
+				{renderDrawer()}
+			</div>
+		</>
+	)
+}
